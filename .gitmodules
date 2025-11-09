@@ -1,3 +1,3 @@
-[submodule "third_party/LatexTemplates"]
-	path = third_party/LatexTemplates
+[submodule "LatexTemplates"]
+	path = LatexTemplates
 	url = https://github.com/Hersch-Nathan/LatexTemplates

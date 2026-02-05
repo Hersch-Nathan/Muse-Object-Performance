@@ -59,14 +59,17 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     intermission = show.get("intermission", {})
     intermission_every = int(intermission.get("every_n_runs", 0) or 0)
     intermission_length = int(intermission.get("length_minutes", 0) or 0)
+    sequential_runs_per_object = int(show.get("sequential_runs_per_object", 2))
 
     # Handle random seed
     random_seed = show.get("random_seed")
     if random_seed is not None:
         random.seed(random_seed)
         initial_object_index = random.randint(0, len(objects) - 1)
+        initial_performer_index = random.randint(0, len(all_performers) - 1)
     else:
         initial_object_index = 0
+        initial_performer_index = 0
 
     start_time = parse_time(show["start_time"])
     current_time = start_time
@@ -89,27 +92,30 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
         row: dict[str, str] = {"Run": run_label, "Time": run_time}
 
-        for char_index, character in enumerate(characters):
-            char_name = character["name"]
-            obj_index = (initial_object_index + run_index + char_index) % len(objects)
-            obj = objects[obj_index]
-            obj_name = obj["name"]
-            
-            # Get available performers for this object
-            available_performers = obj.get("performers", ["None"])
-            
-            # Choose performer with fewest appearances (balanced assignment)
-            if "None" in available_performers:
-                performer = "None"
-            else:
-                # Filter to real performers and find the one with minimum count
-                valid_performers = [p for p in available_performers if p in performer_counts]
-                if valid_performers:
-                    performer = min(valid_performers, key=lambda p: performer_counts[p])
-                    performer_counts[performer] += 1
-                else:
-                    performer = "None"
+        # Determine object: rotates sequentially, with each performer getting
+        # sequential_runs_per_object runs with the same object
+        object_cycle_position = (initial_object_index + run_index // sequential_runs_per_object) % len(objects)
+        obj = objects[object_cycle_position]
+        obj_name = obj["name"]
 
+        # Get available performers for this object
+        available_performers = obj.get("performers", ["None"])
+
+        # Choose performer with fewest appearances (balanced assignment)
+        if "None" in available_performers:
+            performer = "None"
+        else:
+            # Filter to real performers and find the one with minimum count
+            valid_performers = [p for p in available_performers if p in performer_counts]
+            if valid_performers:
+                performer = min(valid_performers, key=lambda p: performer_counts[p])
+                performer_counts[performer] += 1
+            else:
+                performer = "None"
+
+        # Both characters use the same object and performer
+        for character in characters:
+            char_name = character["name"]
             row[char_name] = obj_name
             row[f"{char_name}Performer"] = performer
 

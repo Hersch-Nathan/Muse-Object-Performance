@@ -1,0 +1,31 @@
+show:
+  name: "Show Name"
+  runs_label: "Show Runs"
+  start_time: "7:00 PM"
+  run_count: 12
+  step_minutes: 15
+  intermission:
+    every_n_runs: 6
+    length_minutes: 10
+
+characters:
+  - name: "Domin"
+    offset_start_min: 0
+    offset_end_min: 10
+  - name: "Alquist"
+    offset_start_min: 8
+    offset_end_min: 15
+
+performers:
+  - "Moose"
+  - "Luca"
+
+objects:
+  - name: "Shirt"
+    performer: "Moose"
+  - name: "Muppet"
+    performer: "Luca"
+  - name: "Animatronic"
+    performer: "None"
+  - name: "Robot"
+    performer: "Luca"

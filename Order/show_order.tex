@@ -7,12 +7,22 @@
   keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer}
 ]{showorder}{show_order.csv}
 
+\DTLloaddb[
+  keys={Run,RunStart,Character,CharacterInTime,CharacterOutTime}
+]{moose}{performers/moose.csv}
+
+\DTLloaddb[
+  keys={Run,RunStart,Character,CharacterInTime,CharacterOutTime}
+]{luca}{performers/luca.csv}
+
 \begin{document}
 
 \section*{Show Name}
 Show Runs
 
 \bigskip
+
+\subsection*{Master Schedule}
 
 \begin{longtable}{|l|l|l|l|l|l|}
 \hline
@@ -28,6 +38,46 @@ Run & Time & Domin & Performer & Alquist & Performer \\
   \AlquistPerformer=AlquistPerformer
 }{%
   \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+  \hline
+}
+\end{longtable}
+
+\newpage
+
+\subsection*{Performer Schedule: Moose}
+
+\begin{longtable}{|l|l|l|l|l|}
+\hline
+Run & Run Start & Character & In Time & Out Time \\
+\hline
+\endhead
+\DTLforeach{moose}{
+  \Run=Run,
+  \RunStart=RunStart,
+  \Character=Character,
+  \InTime=CharacterInTime,
+  \OutTime=CharacterOutTime
+}{%
+  \Run & \RunStart & \Character & \InTime & \OutTime \\
+  \hline
+}
+\end{longtable}
+
+\subsection*{Performer Schedule: Luca}
+
+\begin{longtable}{|l|l|l|l|l|}
+\hline
+Run & Run Start & Character & In Time & Out Time \\
+\hline
+\endhead
+\DTLforeach{luca}{
+  \Run=Run,
+  \RunStart=RunStart,
+  \Character=Character,
+  \InTime=CharacterInTime,
+  \OutTime=CharacterOutTime
+}{%
+  \Run & \RunStart & \Character & \InTime & \OutTime \\
   \hline
 }
 \end{longtable}

@@ -59,17 +59,23 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     intermission = show.get("intermission", {})
     intermission_every = int(intermission.get("every_n_runs", 0) or 0)
     intermission_length = int(intermission.get("length_minutes", 0) or 0)
-    sequential_runs_per_object = int(show.get("sequential_runs_per_object", 2))
 
     # Handle random seed
     random_seed = show.get("random_seed")
     if random_seed is not None:
         random.seed(random_seed)
-        initial_object_index = random.randint(0, len(objects) - 1)
-        initial_performer_index = random.randint(0, len(all_performers) - 1)
-    else:
-        initial_object_index = 0
-        initial_performer_index = 0
+
+    # Build permutation pool: all valid (object, performer) pairs
+    permutation_pool = []
+    for obj in objects:
+        obj_name = obj["name"]
+        available_performers = obj.get("performers", ["None"])
+        for performer in available_performers:
+            permutation_pool.append((obj_name, performer))
+
+    # Shuffle permutation pool if random seed is set
+    if random_seed is not None:
+        random.shuffle(permutation_pool)
 
     start_time = parse_time(show["start_time"])
     current_time = start_time
@@ -78,12 +84,15 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
         name: [] for name in all_performers if name != "None"
     }
 
-    # Track performer usage counts (excluding None)
-    performer_counts: dict[str, int] = {
-        name: 0 for name in all_performers if name != "None"
-    }
-
     master_rows: list[dict] = []
+    
+    # Track current position in permutation pool for each character
+    domin_pos = 0
+    alquist_pos = 1 if len(permutation_pool) > 1 else 0
+    
+    # Track last object used for each character to prefer sliding
+    last_domin_obj = None
+    last_alquist_obj = None
 
     for run_index in range(run_count):
         run_number = run_index + 1
@@ -92,32 +101,26 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
         row: dict[str, str] = {"Run": run_label, "Time": run_time}
 
-        # Determine object: rotates sequentially, with each performer getting
-        # sequential_runs_per_object runs with the same object
-        object_cycle_position = (initial_object_index + run_index // sequential_runs_per_object) % len(objects)
-        obj = objects[object_cycle_position]
-        obj_name = obj["name"]
+        # Process Domin
+        domin_obj, domin_performer = permutation_pool[domin_pos % len(permutation_pool)]
+        row["Domin"] = domin_obj
+        row["DominPerformer"] = domin_performer
+        
+        # Process Alquist
+        alquist_obj, alquist_performer = permutation_pool[alquist_pos % len(permutation_pool)]
+        row["Alquist"] = alquist_obj
+        row["AlquistPerformer"] = alquist_performer
 
-        # Get available performers for this object
-        available_performers = obj.get("performers", ["None"])
-
-        # Choose performer with fewest appearances (balanced assignment)
-        if "None" in available_performers:
-            performer = "None"
-        else:
-            # Filter to real performers and find the one with minimum count
-            valid_performers = [p for p in available_performers if p in performer_counts]
-            if valid_performers:
-                performer = min(valid_performers, key=lambda p: performer_counts[p])
-                performer_counts[performer] += 1
-            else:
-                performer = "None"
-
-        # Both characters use the same object and performer
+        # Add performer schedule entries
         for character in characters:
             char_name = character["name"]
-            row[char_name] = obj_name
-            row[f"{char_name}Performer"] = performer
+            
+            if char_name == "Domin":
+                obj_name = domin_obj
+                performer = domin_performer
+            else:  # Alquist
+                obj_name = alquist_obj
+                performer = alquist_performer
 
             if performer != "None":
                 performer_rows.setdefault(performer, [])
@@ -138,6 +141,10 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
         master_rows.append(row)
         current_time += timedelta(minutes=step_minutes)
 
+        # Advance positions for next run
+        domin_pos += 1
+        alquist_pos += 1
+
         if (
             intermission_every
             and intermission_length
@@ -146,18 +153,14 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
         ):
             intermission_time = format_time(current_time)
             intermission_row: dict[str, str] = {"Run": "Intermission", "Time": intermission_time}
-            for character in characters:
-                char_name = character["name"]
-                intermission_row[char_name] = ""
-                intermission_row[f"{char_name}Performer"] = ""
+            intermission_row["Domin"] = ""
+            intermission_row["DominPerformer"] = ""
+            intermission_row["Alquist"] = ""
+            intermission_row["AlquistPerformer"] = ""
             master_rows.append(intermission_row)
             current_time += timedelta(minutes=intermission_length)
 
-    headers = ["Run", "Time"]
-    for character in characters:
-        char_name = character["name"]
-        headers.append(char_name)
-        headers.append(f"{char_name}Performer")
+    headers = ["Run", "Time", "Domin", "DominPerformer", "Alquist", "AlquistPerformer"]
 
     return master_rows, performer_rows, headers
 

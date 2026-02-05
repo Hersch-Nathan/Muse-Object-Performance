@@ -4,11 +4,10 @@ show:
   start_time: "7:00 PM"
   run_count: 12
   step_minutes: 15
-  sequential_runs_per_object: 2  # How many consecutive runs to use the same object before rotating
   intermission:
     every_n_runs: 6
     length_minutes: 10
-  random_seed: null  # Set to a number for reproducible random start, null for no randomization
+  random_seed: null  # Set to a number for reproducible random permutation order, null for no randomization
 
 characters:
   - name: "Domin"

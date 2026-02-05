@@ -66,17 +66,13 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     if random_seed is not None:
         random.seed(random_seed)
 
-    # Build permutation pool: all valid (object, performer) pairs
-    permutation_pool = []
+    # Build base permutation pool: all valid (object, performer) pairs
+    base_permutation_pool = []
     for obj in objects:
         obj_name = obj["name"]
         available_performers = obj.get("performers", ["None"])
         for performer in available_performers:
-            permutation_pool.append((obj_name, performer))
-
-    # Shuffle permutation pool if random seed is set
-    if random_seed is not None:
-        random.shuffle(permutation_pool)
+            base_permutation_pool.append((obj_name, performer))
 
     start_time = parse_time(show["start_time"])
     current_time = start_time
@@ -87,126 +83,146 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
     master_rows: list[dict] = []
     
-    # Track current position in permutation pool for each character
-    domin_pos = 0
-    alquist_pos = 1 if len(permutation_pool) > 1 else 0
-    
     # Track which performer was used before intermission for diversity
     last_performer_before_intermission = None
 
-    for run_index in range(run_count):
-        run_number = run_index + 1
-        run_label = str(run_number)
-        run_time = format_time(current_time)
-
-        row: dict[str, str] = {"Run": run_label, "Time": run_time}
-
-        # Check if this run should have Animatronic on one position (before/after intermission)
-        force_domin_none = False
-        force_alquist_none = False
-        if none_before_after and intermission_every > 0:
-            # Run before intermission: force Domin to Animatronic
-            if run_number % intermission_every == 0 and run_number != run_count:
-                force_domin_none = True
-            # Run after intermission: force Alquist to Animatronic
-            elif run_number % intermission_every == 1 and run_number != 1:
-                force_alquist_none = True
-
-        # Process Domin
-        if force_domin_none:
-            domin_obj = "Animatronic"
-            domin_performer = "None"
-        else:
-            domin_obj, domin_performer = permutation_pool[domin_pos % len(permutation_pool)]
-            # Skip if this would use the same performer as before intermission
-            if force_alquist_none and last_performer_before_intermission and domin_performer == last_performer_before_intermission:
-                # Try to find different performer in next positions
-                temp_pos = domin_pos
-                for _ in range(len(permutation_pool)):
-                    temp_pos += 1
-                    temp_obj, temp_performer = permutation_pool[temp_pos % len(permutation_pool)]
-                    if temp_performer != last_performer_before_intermission:
-                        domin_obj, domin_performer = temp_obj, temp_performer
-                        domin_pos = temp_pos
-                        break
-        row["Domin"] = domin_obj
-        row["DominPerformer"] = domin_performer
+    # Calculate segments based on intermission_every
+    if intermission_every > 0:
+        num_segments = (run_count + intermission_every - 1) // intermission_every
+    else:
+        num_segments = 1
+    
+    # Process runs in segments
+    for segment_index in range(num_segments):
+        # Calculate runs in this segment
+        segment_start = segment_index * intermission_every
+        segment_end = min(segment_start + intermission_every, run_count)
         
-        # Process Alquist
-        if force_alquist_none:
-            alquist_obj = "Animatronic"
-            alquist_performer = "None"
-        else:
-            alquist_obj, alquist_performer = permutation_pool[alquist_pos % len(permutation_pool)]
-            # Track performer before intermission for diversity check
+        # Create a fresh shuffle for this segment
+        segment_pool = base_permutation_pool.copy()
+        if random_seed is not None:
+            # Use segment index to vary the shuffle per segment
+            random.seed(random_seed + segment_index)
+            random.shuffle(segment_pool)
+        
+        # Reset positions at the start of each segment (maintain offset)
+        domin_pos = 0
+        alquist_pos = 1 if len(segment_pool) > 1 else 0
+        
+        for run_index in range(segment_start, segment_end):
+            run_number = run_index + 1
+            run_label = str(run_number)
+            run_time = format_time(current_time)
+
+            row: dict[str, str] = {"Run": run_label, "Time": run_time}
+
+            # Check if this run should have Animatronic on one position (before/after intermission)
+            force_domin_none = False
+            force_alquist_none = False
+            if none_before_after and intermission_every > 0:
+                # Run before intermission: force Domin to Animatronic
+                if run_number % intermission_every == 0 and run_number != run_count:
+                    force_domin_none = True
+                # Run after intermission: force Alquist to Animatronic
+                elif run_number % intermission_every == 1 and run_number != 1:
+                    force_alquist_none = True
+
+            # Process Domin
             if force_domin_none:
-                last_performer_before_intermission = alquist_performer
-        row["Alquist"] = alquist_obj
-        row["AlquistPerformer"] = alquist_performer
-
-        # Add performer schedule entries
-        for character in characters:
-            char_name = character["name"]
+                domin_obj = "Animatronic"
+                domin_performer = "None"
+            else:
+                domin_obj, domin_performer = segment_pool[domin_pos % len(segment_pool)]
+                # Skip if this would use the same performer as before intermission
+                if force_alquist_none and last_performer_before_intermission and domin_performer == last_performer_before_intermission:
+                    # Try to find different performer in next positions
+                    temp_pos = domin_pos
+                    for _ in range(len(segment_pool)):
+                        temp_pos += 1
+                        temp_obj, temp_performer = segment_pool[temp_pos % len(segment_pool)]
+                        if temp_performer != last_performer_before_intermission:
+                            domin_obj, domin_performer = temp_obj, temp_performer
+                            domin_pos = temp_pos
+                            break
+            row["Domin"] = domin_obj
+            row["DominPerformer"] = domin_performer
             
-            if char_name == "Domin":
-                obj_name = domin_obj
-                performer = domin_performer
-            else:  # Alquist
-                obj_name = alquist_obj
-                performer = alquist_performer
+            # Process Alquist
+            if force_alquist_none:
+                alquist_obj = "Animatronic"
+                alquist_performer = "None"
+            else:
+                alquist_obj, alquist_performer = segment_pool[alquist_pos % len(segment_pool)]
+                # Track performer before intermission for diversity check
+                if force_domin_none:
+                    last_performer_before_intermission = alquist_performer
+            row["Alquist"] = alquist_obj
+            row["AlquistPerformer"] = alquist_performer
 
-            if performer != "None":
-                performer_rows.setdefault(performer, [])
-                offset_start = int(character.get("offset_start_min", 0))
-                offset_end = int(character.get("offset_end_min", 0))
-                in_time = format_time(current_time + timedelta(minutes=offset_start))
-                out_time = format_time(current_time + timedelta(minutes=offset_end))
-                performer_rows[performer].append(
-                    {
-                        "Run": run_label,
-                        "RunStart": run_time,
-                        "Character": char_name,
-                        "CharacterInTime": in_time,
-                        "CharacterOutTime": out_time,
-                    }
-                )
+            # Add performer schedule entries
+            for character in characters:
+                char_name = character["name"]
+                
+                if char_name == "Domin":
+                    obj_name = domin_obj
+                    performer = domin_performer
+                else:  # Alquist
+                    obj_name = alquist_obj
+                    performer = alquist_performer
 
-        master_rows.append(row)
-        current_time += timedelta(minutes=step_minutes)
+                if performer != "None":
+                    performer_rows.setdefault(performer, [])
+                    offset_start = int(character.get("offset_start_min", 0))
+                    offset_end = int(character.get("offset_end_min", 0))
+                    in_time = format_time(current_time + timedelta(minutes=offset_start))
+                    out_time = format_time(current_time + timedelta(minutes=offset_end))
+                    performer_rows[performer].append(
+                        {
+                            "Run": run_label,
+                            "RunStart": run_time,
+                            "Character": char_name,
+                            "CharacterInTime": in_time,
+                            "CharacterOutTime": out_time,
+                        }
+                    )
 
-        # Advance positions for next run (unless we forced None on that position)
-        if not force_domin_none:
-            domin_pos += 1
-        if not force_alquist_none:
-            alquist_pos += 1
+            master_rows.append(row)
+            current_time += timedelta(minutes=step_minutes)
 
-        if (
-            intermission_every
-            and intermission_length
-            and run_number % intermission_every == 0
-            and run_number != run_count
-        ):
-            intermission_time = format_time(current_time)
-            intermission_row: dict[str, str] = {"Run": "Intermission", "Time": intermission_time}
-            intermission_row["Domin"] = ""
-            intermission_row["DominPerformer"] = ""
-            intermission_row["Alquist"] = ""
-            intermission_row["AlquistPerformer"] = ""
-            master_rows.append(intermission_row)
-            
-            # Add intermission to all performer schedules
-            for performer in performer_rows.keys():
-                performer_rows[performer].append(
-                    {
-                        "Run": "Intermission",
-                        "RunStart": intermission_time,
-                        "Character": "",
-                        "CharacterInTime": "",
-                        "CharacterOutTime": "",
-                    }
-                )
-            
-            current_time += timedelta(minutes=intermission_length)
+            # Advance positions for next run (unless we forced None on that position)
+            if not force_domin_none:
+                domin_pos += 1
+            if not force_alquist_none:
+                alquist_pos += 1
+
+            # Add intermission if this is the last run of the segment (but not the last run overall)
+            if (
+                intermission_every
+                and intermission_length
+                and run_number % intermission_every == 0
+                and run_number != run_count
+            ):
+                intermission_time = format_time(current_time)
+                intermission_row: dict[str, str] = {"Run": "Intermission", "Time": intermission_time}
+                intermission_row["Domin"] = ""
+                intermission_row["DominPerformer"] = ""
+                intermission_row["Alquist"] = ""
+                intermission_row["AlquistPerformer"] = ""
+                master_rows.append(intermission_row)
+                
+                # Add intermission to all performer schedules
+                for performer in performer_rows.keys():
+                    performer_rows[performer].append(
+                        {
+                            "Run": "Intermission",
+                            "RunStart": intermission_time,
+                            "Character": "",
+                            "CharacterInTime": "",
+                            "CharacterOutTime": "",
+                        }
+                    )
+                
+                current_time += timedelta(minutes=intermission_length)
 
     headers = ["Run", "Time", "Domin", "DominPerformer", "Alquist", "AlquistPerformer"]
 

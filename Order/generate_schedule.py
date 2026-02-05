@@ -10,6 +10,8 @@ except ImportError as exc:  # pragma: no cover - runtime dependency message
         "Missing dependency: pyyaml. Install with 'pip install pyyaml'."
     ) from exc
 
+from rules_engine import RulesEngine
+
 
 TIME_FORMATS = ["%I:%M %p", "%I %p", "%H:%M"]
 
@@ -43,76 +45,17 @@ def ensure_output_dir(path: str) -> None:
     os.makedirs(path, exist_ok=True)
 
 
-def validate_permutation(perm, position, run_history, other_position_perm=None):
-    """
-    Validate if a permutation can be used at this position.
-    Returns (is_valid, gap_score) where gap_score is used for preference ranking.
-    
-    Hard Rules (must pass):
-    1. Same permutation cannot appear consecutively in same position
-    2. Same permutation cannot appear in both positions in same run
-    3. Same object cannot appear in both positions in same run
-    
-    Soft Rules (affects gap_score):
-    5. Prefer gap >= 2 between same permutation in same position
-    """
-    obj, performer = perm
-    
-    # Rule 2: Check if same permutation already used in other position this run
-    if other_position_perm and other_position_perm == perm:
-        return False, -1000
-    
-    # Rule 3: Check if same object already used in other position this run
-    if other_position_perm:
-        other_obj, _ = other_position_perm
-        if obj == other_obj:
-            return False, -1000
-    
-    # Rule 1: Check for consecutive same permutation in same position
-    position_history = [entry[position] for entry in run_history]
-    if position_history and position_history[-1] == perm:
-        return False, -1000  # Hard violation
-    
-    # Rule 5: Calculate gap score (prefer larger gaps)
-    gap_score = 0
-    for i in range(len(position_history) - 1, -1, -1):
-        if position_history[i] == perm:
-            gap = len(position_history) - 1 - i
-            if gap >= 2:
-                gap_score = 100  # Good gap
-            elif gap == 1:
-                gap_score = 50   # Acceptable gap
-            # gap == 0 would be consecutive, already rejected above
-            break
-    else:
-        gap_score = 100  # Never used in this position, best score
-    
-    return True, gap_score
-
-
-def select_best_permutation(available_perms, position, run_history, other_position_perm=None):
-    """
-    Select the best permutation from available options based on constraints.
-    Returns (best_perm, index_in_available) or (None, -1) if no valid option.
-    """
-    valid_options = []
-    
-    for idx, perm in enumerate(available_perms):
-        is_valid, gap_score = validate_permutation(perm, position, run_history, other_position_perm)
-        if is_valid:
-            valid_options.append((perm, idx, gap_score))
-    
-    if not valid_options:
-        return None, -1
-    
-    # Sort by gap_score (descending) to prefer better gaps
-    valid_options.sort(key=lambda x: x[2], reverse=True)
-    best_perm, best_idx, _ = valid_options[0]
-    
-    return best_perm, best_idx
-
-
 def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[str]]:
+    """
+    Build master and performer schedules using RulesEngine for constraint validation.
+    
+    Uses 5 rules:
+    - Hard Rule 1: No same performer in both positions in same run
+    - Hard Rule 2: No same object in both positions in same run
+    - Hard Rule 3: No same object in same position across consecutive runs
+    - Soft Rule 4: Prefer gap of 2+ between same (object, performer) pair
+    - Soft Rule 5: Try to place Animatronic at intermission boundaries
+    """
     show = config["show"]
     characters = config["characters"]
     objects = config["objects"]
@@ -135,7 +78,7 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     if random_seed is not None:
         random.seed(random_seed)
 
-    # Build base permutation pool: all valid (object, performer) pairs
+    # Build base permutation pool
     base_permutation_pool = []
     animatronic_perm = None
     for obj in objects:
@@ -144,7 +87,6 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
         for performer in available_performers:
             perm = (obj_name, performer)
             base_permutation_pool.append(perm)
-            # Track Animatronic permutation for intermission breaks
             if obj_name == "Animatronic" and performer == "None":
                 animatronic_perm = perm
 
@@ -156,11 +98,9 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     }
 
     master_rows: list[dict] = []
-    
-    # Track run history for constraint validation: list of {"Domin": perm, "Alquist": perm}
-    run_history = []
+    rules = RulesEngine()
 
-    # Calculate segments based on intermission_every
+    # Calculate segments
     if intermission_every > 0:
         num_segments = (run_count + intermission_every - 1) // intermission_every
     else:
@@ -168,21 +108,21 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     
     # Process runs in segments
     for segment_index in range(num_segments):
-        # Calculate runs in this segment
         segment_start = segment_index * intermission_every if intermission_every > 0 else 0
         segment_end = min(segment_start + intermission_every, run_count) if intermission_every > 0 else run_count
         
-        # Create a fresh shuffle for this segment
+        # Fresh shuffle per segment
         segment_pool = base_permutation_pool.copy()
         if random_seed is not None:
-            # Use segment index to vary the shuffle per segment
             random.seed(random_seed + segment_index)
             random.shuffle(segment_pool)
         
-        # Create circular iterator lists for each position
+        # Reset rules engine for new segment
+        rules.reset()
+        
+        # Create pool iterators
         domin_pool = segment_pool.copy()
         alquist_pool = segment_pool.copy()
-        # Maintain offset: Alquist starts 1 position ahead
         if len(alquist_pool) > 1:
             alquist_pool = alquist_pool[1:] + alquist_pool[:1]
         
@@ -196,69 +136,66 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
             row: dict[str, str] = {"Run": run_label, "Time": run_time}
 
-            # Determine if we should try to force Animatronic for intermission breaks
+            # Rule 5: Try to place Animatronic at intermission boundaries
             try_force_domin_none = False
             try_force_alquist_none = False
             if none_before_after and intermission_every > 0 and animatronic_perm:
-                # Run before intermission: try Domin = Animatronic
                 if run_number % intermission_every == 0 and run_number != run_count:
                     try_force_domin_none = True
-                # Run after intermission: try Alquist = Animatronic
                 elif run_number % intermission_every == 1 and run_number != 1:
                     try_force_alquist_none = True
 
             domin_perm = None
             alquist_perm = None
 
-            # Process Domin first
+            # Find Domin permutation
             if try_force_domin_none:
-                # Try to use Animatronic if it passes constraints
-                is_valid, _ = validate_permutation(animatronic_perm, "Domin", run_history, None)
-                if is_valid:
+                # Try forced Animatronic first
+                if rules.rule3_no_same_object_consecutive_runs("Domin", "Animatronic"):
                     domin_perm = animatronic_perm
             
             if not domin_perm:
-                # Search for valid permutation in domin_pool
+                # Search pool for valid permutation
                 attempts = 0
-                max_attempts = len(domin_pool) * 2  # Allow wraparound
+                max_attempts = len(domin_pool) * 2
                 while attempts < max_attempts:
                     candidate = domin_pool[domin_idx % len(domin_pool)]
-                    is_valid, _ = validate_permutation(candidate, "Domin", run_history, None)
-                    if is_valid:
+                    if rules.rule3_no_same_object_consecutive_runs("Domin", candidate[0]):
                         domin_perm = candidate
                         break
                     domin_idx += 1
                     attempts += 1
                 
                 if not domin_perm:
-                    # Fallback: use current position anyway (should not happen with valid config)
                     domin_perm = domin_pool[domin_idx % len(domin_pool)]
-            
-            # Process Alquist
-            if try_force_alquist_none and not try_force_domin_none:  # Don't force both
-                # Try to use Animatronic if it passes constraints
-                is_valid, _ = validate_permutation(animatronic_perm, "Alquist", run_history, domin_perm)
-                if is_valid:
-                    alquist_perm = animatronic_perm
+
+            # Find Alquist permutation
+            if try_force_alquist_none and not try_force_domin_none:
+                if rules.rule3_no_same_object_consecutive_runs("Alquist", "Animatronic"):
+                    # Check hard rules with Domin
+                    if (rules.rule1_no_same_performer_both_positions(domin_perm, animatronic_perm) and
+                        rules.rule2_no_same_object_both_positions(domin_perm, animatronic_perm)):
+                        alquist_perm = animatronic_perm
             
             if not alquist_perm:
-                # Search for valid permutation in alquist_pool
+                # Search pool for valid permutation
                 attempts = 0
                 max_attempts = len(alquist_pool) * 2
                 while attempts < max_attempts:
                     candidate = alquist_pool[alquist_idx % len(alquist_pool)]
-                    is_valid, _ = validate_permutation(candidate, "Alquist", run_history, domin_perm)
-                    if is_valid:
+                    # Check all hard rules
+                    if (rules.rule3_no_same_object_consecutive_runs("Alquist", candidate[0]) and
+                        rules.rule1_no_same_performer_both_positions(domin_perm, candidate) and
+                        rules.rule2_no_same_object_both_positions(domin_perm, candidate)):
                         alquist_perm = candidate
                         break
                     alquist_idx += 1
                     attempts += 1
                 
                 if not alquist_perm:
-                    # Fallback: use current position anyway
                     alquist_perm = alquist_pool[alquist_idx % len(alquist_pool)]
-            
-            # Store selections
+
+            # Record in row
             domin_obj, domin_performer = domin_perm
             alquist_obj, alquist_performer = alquist_perm
             
@@ -267,8 +204,8 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
             row["Alquist"] = alquist_obj
             row["AlquistPerformer"] = alquist_performer
             
-            # Track in run history for future constraint checks
-            run_history.append({"Domin": domin_perm, "Alquist": alquist_perm})
+            # Track in rules engine
+            rules.record_run(domin_perm, alquist_perm)
 
             # Add performer schedule entries
             for character in characters:
@@ -277,7 +214,7 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
                 if char_name == "Domin":
                     obj_name = domin_obj
                     performer = domin_performer
-                else:  # Alquist
+                else:
                     obj_name = alquist_obj
                     performer = alquist_performer
 
@@ -299,42 +236,36 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
             master_rows.append(row)
             current_time += timedelta(minutes=step_minutes)
-
-            # Advance pool indices for next run (prefer to move forward)
             domin_idx += 1
             alquist_idx += 1
 
-            # Add intermission if this is the last run of the segment (but not the last run overall)
-            if (
-                intermission_every
-                and intermission_length
-                and run_number % intermission_every == 0
-                and run_number != run_count
-            ):
+            # Add intermission
+            if (intermission_every and intermission_length and 
+                run_number % intermission_every == 0 and run_number != run_count):
+                
                 intermission_time = format_time(current_time)
-                intermission_row: dict[str, str] = {"Run": "Intermission", "Time": intermission_time}
-                intermission_row["Domin"] = ""
-                intermission_row["DominPerformer"] = ""
-                intermission_row["Alquist"] = ""
-                intermission_row["AlquistPerformer"] = ""
+                intermission_row: dict[str, str] = {
+                    "Run": "Intermission",
+                    "Time": intermission_time,
+                    "Domin": "",
+                    "DominPerformer": "",
+                    "Alquist": "",
+                    "AlquistPerformer": "",
+                }
                 master_rows.append(intermission_row)
                 
-                # Add intermission to all performer schedules
                 for performer in performer_rows.keys():
-                    performer_rows[performer].append(
-                        {
-                            "Run": "Intermission",
-                            "RunStart": intermission_time,
-                            "Character": "",
-                            "CharacterInTime": "",
-                            "CharacterOutTime": "",
-                        }
-                    )
+                    performer_rows[performer].append({
+                        "Run": "Intermission",
+                        "RunStart": intermission_time,
+                        "Character": "",
+                        "CharacterInTime": "",
+                        "CharacterOutTime": "",
+                    })
                 
                 current_time += timedelta(minutes=intermission_length)
 
     headers = ["Run", "Time", "Domin", "DominPerformer", "Alquist", "AlquistPerformer"]
-
     return master_rows, performer_rows, headers
 
 

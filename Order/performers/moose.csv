@@ -1,7 +1,10 @@
 Run,RunStart,Character,CharacterInTime,CharacterOutTime
 1,7:00 PM,Domin,7:00 PM,7:10 PM
-4,7:45 PM,Alquist,7:53 PM,8:00 PM
+2,7:15 PM,Domin,7:15 PM,7:25 PM
+4,7:45 PM,Domin,7:45 PM,7:55 PM
 5,8:00 PM,Domin,8:00 PM,8:10 PM
-8,8:55 PM,Alquist,9:03 PM,9:10 PM
+6,8:15 PM,Domin,8:15 PM,8:25 PM
+8,8:55 PM,Domin,8:55 PM,9:05 PM
 9,9:10 PM,Domin,9:10 PM,9:20 PM
-12,9:55 PM,Alquist,10:03 PM,10:10 PM
+10,9:25 PM,Domin,9:25 PM,9:35 PM
+12,9:55 PM,Domin,9:55 PM,10:05 PM

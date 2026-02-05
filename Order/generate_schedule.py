@@ -59,6 +59,7 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     intermission = show.get("intermission", {})
     intermission_every = int(intermission.get("every_n_runs", 0) or 0)
     intermission_length = int(intermission.get("length_minutes", 0) or 0)
+    none_before_after = intermission.get("none_before_after", False)
 
     # Handle random seed
     random_seed = show.get("random_seed")
@@ -97,13 +98,29 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
         row: dict[str, str] = {"Run": run_label, "Time": run_time}
 
+        # Check if this run should have None performers (before/after intermission)
+        force_none = False
+        if none_before_after and intermission_every > 0:
+            # Check if next run is an intermission or this run comes right after one
+            if (run_number % intermission_every == 0 and run_number != run_count) or \
+               (run_number % intermission_every == 1 and run_number != 1):
+                force_none = True
+
         # Process Domin
-        domin_obj, domin_performer = permutation_pool[domin_pos % len(permutation_pool)]
+        if force_none:
+            domin_obj = "Animatronic"
+            domin_performer = "None"
+        else:
+            domin_obj, domin_performer = permutation_pool[domin_pos % len(permutation_pool)]
         row["Domin"] = domin_obj
         row["DominPerformer"] = domin_performer
         
         # Process Alquist
-        alquist_obj, alquist_performer = permutation_pool[alquist_pos % len(permutation_pool)]
+        if force_none:
+            alquist_obj = "Animatronic"
+            alquist_performer = "None"
+        else:
+            alquist_obj, alquist_performer = permutation_pool[alquist_pos % len(permutation_pool)]
         row["Alquist"] = alquist_obj
         row["AlquistPerformer"] = alquist_performer
 
@@ -137,9 +154,10 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
         master_rows.append(row)
         current_time += timedelta(minutes=step_minutes)
 
-        # Advance positions for next run
-        domin_pos += 1
-        alquist_pos += 1
+        # Advance positions for next run (unless we forced None, in which case reuse positions)
+        if not force_none:
+            domin_pos += 1
+            alquist_pos += 1
 
         if (
             intermission_every

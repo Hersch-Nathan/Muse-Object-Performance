@@ -1,5 +1,5 @@
 show:
-  name: "Show Name"
+  name: "Assembled"
   runs_label: "Show Runs"
   start_time: "7:00 PM"
   run_count: 12
@@ -7,6 +7,7 @@ show:
   intermission:
     every_n_runs: 6
     length_minutes: 10
+    none_before_after: true  # If true, force None performers before and after intermission for performer breaks
   random_seed: null  # Set to a number for reproducible random permutation order, null for no randomization
 
 characters:

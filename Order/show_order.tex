@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{datatool}
 \usepackage[margin=1in]{geometry}
+\usepackage{longtable}
 
 \DTLloaddb[
   keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer}
@@ -13,10 +14,11 @@ Show Runs
 
 \bigskip
 
-\begin{tabular}{|l|l|l|l|l|l|}
+\begin{longtable}{|l|l|l|l|l|l|}
 \hline
 Run & Time & Domin & Performer & Alquist & Performer \\
 \hline
+\endhead
 \DTLforeach{showorder}{
   \Run=Run,
   \Time=Time,
@@ -25,13 +27,9 @@ Run & Time & Domin & Performer & Alquist & Performer \\
   \Alquist=Alquist,
   \AlquistPerformer=AlquistPerformer
 }{%
-  \DTLifstringequal{\Run}{Intermission}{%
-    \multicolumn{6}{|c|}{Intermission (starts at \Time)} \\
-  }{%
-    \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
-  }%
+  \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
   \hline
 }
-\end{tabular}
+\end{longtable}
 
 \end{document}

@@ -26,9 +26,11 @@ Show Runs
 
 \begin{longtable}{|l|l|l|l|l|l|}
 \hline
-Run & Time & Domin & Performer & Alquist & Performer \\
+\textbf{Run} & \textbf{Time} & \textbf{Domin} & \textbf{Performer} & \textbf{Alquist} & \textbf{Performer} \\
 \hline
 \endhead
+\hline
+\endfoot
 \DTLforeach{showorder}{
   \Run=Run,
   \Time=Time,
@@ -48,9 +50,11 @@ Run & Time & Domin & Performer & Alquist & Performer \\
 
 \begin{longtable}{|l|l|l|l|l|}
 \hline
-Run & Run Start & Character & In Time & Out Time \\
+\textbf{Run} & \textbf{Run Start} & \textbf{Character} & \textbf{In Time} & \textbf{Out Time} \\
 \hline
 \endhead
+\hline
+\endfoot
 \DTLforeach{moose}{
   \Run=Run,
   \RunStart=RunStart,
@@ -67,9 +71,11 @@ Run & Run Start & Character & In Time & Out Time \\
 
 \begin{longtable}{|l|l|l|l|l|}
 \hline
-Run & Run Start & Character & In Time & Out Time \\
+\textbf{Run} & \textbf{Run Start} & \textbf{Character} & \textbf{In Time} & \textbf{Out Time} \\
 \hline
 \endhead
+\hline
+\endfoot
 \DTLforeach{luca}{
   \Run=Run,
   \RunStart=RunStart,

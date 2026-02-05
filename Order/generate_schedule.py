@@ -89,10 +89,6 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     # Track current position in permutation pool for each character
     domin_pos = 0
     alquist_pos = 1 if len(permutation_pool) > 1 else 0
-    
-    # Track last object used for each character to prefer sliding
-    last_domin_obj = None
-    last_alquist_obj = None
 
     for run_index in range(run_count):
         run_number = run_index + 1
@@ -158,6 +154,19 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
             intermission_row["Alquist"] = ""
             intermission_row["AlquistPerformer"] = ""
             master_rows.append(intermission_row)
+            
+            # Add intermission to all performer schedules
+            for performer in performer_rows.keys():
+                performer_rows[performer].append(
+                    {
+                        "Run": "Intermission",
+                        "RunStart": intermission_time,
+                        "Character": "",
+                        "CharacterInTime": "",
+                        "CharacterOutTime": "",
+                    }
+                )
+            
             current_time += timedelta(minutes=intermission_length)
 
     headers = ["Run", "Time", "Domin", "DominPerformer", "Alquist", "AlquistPerformer"]

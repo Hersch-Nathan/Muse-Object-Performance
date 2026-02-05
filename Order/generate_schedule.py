@@ -90,6 +90,9 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     # Track current position in permutation pool for each character
     domin_pos = 0
     alquist_pos = 1 if len(permutation_pool) > 1 else 0
+    
+    # Track which performer was used before intermission for diversity
+    last_performer_before_intermission = None
 
     for run_index in range(run_count):
         run_number = run_index + 1
@@ -98,29 +101,46 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
         row: dict[str, str] = {"Run": run_label, "Time": run_time}
 
-        # Check if this run should have None performers (before/after intermission)
-        force_none = False
+        # Check if this run should have Animatronic on one position (before/after intermission)
+        force_domin_none = False
+        force_alquist_none = False
         if none_before_after and intermission_every > 0:
-            # Check if next run is an intermission or this run comes right after one
-            if (run_number % intermission_every == 0 and run_number != run_count) or \
-               (run_number % intermission_every == 1 and run_number != 1):
-                force_none = True
+            # Run before intermission: force Domin to Animatronic
+            if run_number % intermission_every == 0 and run_number != run_count:
+                force_domin_none = True
+            # Run after intermission: force Alquist to Animatronic
+            elif run_number % intermission_every == 1 and run_number != 1:
+                force_alquist_none = True
 
         # Process Domin
-        if force_none:
+        if force_domin_none:
             domin_obj = "Animatronic"
             domin_performer = "None"
         else:
             domin_obj, domin_performer = permutation_pool[domin_pos % len(permutation_pool)]
+            # Skip if this would use the same performer as before intermission
+            if force_alquist_none and last_performer_before_intermission and domin_performer == last_performer_before_intermission:
+                # Try to find different performer in next positions
+                temp_pos = domin_pos
+                for _ in range(len(permutation_pool)):
+                    temp_pos += 1
+                    temp_obj, temp_performer = permutation_pool[temp_pos % len(permutation_pool)]
+                    if temp_performer != last_performer_before_intermission:
+                        domin_obj, domin_performer = temp_obj, temp_performer
+                        domin_pos = temp_pos
+                        break
         row["Domin"] = domin_obj
         row["DominPerformer"] = domin_performer
         
         # Process Alquist
-        if force_none:
+        if force_alquist_none:
             alquist_obj = "Animatronic"
             alquist_performer = "None"
         else:
             alquist_obj, alquist_performer = permutation_pool[alquist_pos % len(permutation_pool)]
+            # Track performer before intermission for diversity check
+            if force_domin_none:
+                last_performer_before_intermission = alquist_performer
         row["Alquist"] = alquist_obj
         row["AlquistPerformer"] = alquist_performer
 
@@ -154,9 +174,10 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
         master_rows.append(row)
         current_time += timedelta(minutes=step_minutes)
 
-        # Advance positions for next run (unless we forced None, in which case reuse positions)
-        if not force_none:
+        # Advance positions for next run (unless we forced None on that position)
+        if not force_domin_none:
             domin_pos += 1
+        if not force_alquist_none:
             alquist_pos += 1
 
         if (

@@ -46,22 +46,11 @@ def ensure_output_dir(path: str) -> None:
 
 
 def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[str]]:
-    """
-    Build master and performer schedules using RulesEngine for constraint validation.
-    
-    Uses 5 rules:
-    - Hard Rule 1: No same performer in both positions in same run
-    - Hard Rule 2: No same object in both positions in same run
-    - Hard Rule 3: No same object in same position across consecutive runs
-    - Soft Rule 4: Prefer gap of 2+ between same (object, performer) pair
-    - Soft Rule 5: Try to place Animatronic at intermission boundaries
-    """
     show = config["show"]
     characters = config["characters"]
     objects = config["objects"]
     all_performers = config.get("performers", [])
 
-    # Expand "all" in object performers
     for obj in objects:
         if obj.get("performers") == ["all"]:
             obj["performers"] = all_performers.copy()
@@ -73,12 +62,10 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     intermission_length = int(intermission.get("length_minutes", 0) or 0)
     none_before_after = intermission.get("none_before_after", False)
 
-    # Handle random seed
     random_seed = show.get("random_seed")
     if random_seed is not None:
         random.seed(random_seed)
 
-    # Build base permutation pool
     base_permutation_pool = []
     animatronic_perm = None
     for obj in objects:
@@ -93,34 +80,32 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     start_time = parse_time(show["start_time"])
     current_time = start_time
 
+    object_names = [obj["name"] for obj in objects]
+
     performer_rows: dict[str, list[dict]] = {
         name: [] for name in all_performers if name != "None"
     }
 
     master_rows: list[dict] = []
-    rules = RulesEngine()
+    rules = RulesEngine(all_performers, object_names)
+    last_intermission_pair_performer = None
 
-    # Calculate segments
     if intermission_every > 0:
         num_segments = (run_count + intermission_every - 1) // intermission_every
     else:
         num_segments = 1
     
-    # Process runs in segments
     for segment_index in range(num_segments):
         segment_start = segment_index * intermission_every if intermission_every > 0 else 0
         segment_end = min(segment_start + intermission_every, run_count) if intermission_every > 0 else run_count
         
-        # Fresh shuffle per segment
         segment_pool = base_permutation_pool.copy()
         if random_seed is not None:
             random.seed(random_seed + segment_index)
             random.shuffle(segment_pool)
         
-        # Reset rules engine for new segment
         rules.reset()
         
-        # Create pool iterators
         domin_pool = segment_pool.copy()
         alquist_pool = segment_pool.copy()
         if len(alquist_pool) > 1:
@@ -136,7 +121,6 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
             row: dict[str, str] = {"Run": run_label, "Time": run_time}
 
-            # Rule 5: Try to place Animatronic at intermission boundaries
             try_force_domin_none = False
             try_force_alquist_none = False
             if none_before_after and intermission_every > 0 and animatronic_perm:
@@ -145,57 +129,66 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
                 elif run_number % intermission_every == 1 and run_number != 1:
                     try_force_alquist_none = True
 
+            is_after_intermission = (
+                intermission_every > 0
+                and run_number % intermission_every == 1
+                and run_number != 1
+            )
+
             domin_perm = None
             alquist_perm = None
 
-            # Find Domin permutation
             if try_force_domin_none:
-                # Try forced Animatronic first
-                if rules.rule3_no_same_object_consecutive_runs("Domin", "Animatronic"):
-                    domin_perm = animatronic_perm
-            
-            if not domin_perm:
-                # Search pool for valid permutation
-                attempts = 0
-                max_attempts = len(domin_pool) * 2
-                while attempts < max_attempts:
-                    candidate = domin_pool[domin_idx % len(domin_pool)]
-                    if rules.rule3_no_same_object_consecutive_runs("Domin", candidate[0]):
-                        domin_perm = candidate
-                        break
-                    domin_idx += 1
-                    attempts += 1
-                
-                if not domin_perm:
-                    domin_perm = domin_pool[domin_idx % len(domin_pool)]
+                domin_candidates = [animatronic_perm] if animatronic_perm else []
+            else:
+                domin_candidates = domin_pool
 
-            # Find Alquist permutation
-            if try_force_alquist_none and not try_force_domin_none:
-                if rules.rule3_no_same_object_consecutive_runs("Alquist", "Animatronic"):
-                    # Check hard rules with Domin
-                    if (rules.rule1_no_same_performer_both_positions(domin_perm, animatronic_perm) and
-                        rules.rule2_no_same_object_both_positions(domin_perm, animatronic_perm)):
-                        alquist_perm = animatronic_perm
-            
-            if not alquist_perm:
-                # Search pool for valid permutation
-                attempts = 0
-                max_attempts = len(alquist_pool) * 2
-                while attempts < max_attempts:
-                    candidate = alquist_pool[alquist_idx % len(alquist_pool)]
-                    # Check all hard rules
-                    if (rules.rule3_no_same_object_consecutive_runs("Alquist", candidate[0]) and
-                        rules.rule1_no_same_performer_both_positions(domin_perm, candidate) and
-                        rules.rule2_no_same_object_both_positions(domin_perm, candidate)):
-                        alquist_perm = candidate
-                        break
-                    alquist_idx += 1
-                    attempts += 1
-                
-                if not alquist_perm:
-                    alquist_perm = alquist_pool[alquist_idx % len(alquist_pool)]
+            best_score = None
+            best_pair = None
 
-            # Record in row
+            for domin_candidate in domin_candidates:
+                if domin_candidate is None:
+                    continue
+                if not rules.rule3_no_same_object_consecutive_runs("Domin", domin_candidate[0]):
+                    continue
+                if not rules.rule4_consecutive_object_same_performer("Domin", domin_candidate):
+                    continue
+
+                if try_force_alquist_none and not try_force_domin_none:
+                    alquist_candidates = [animatronic_perm] if animatronic_perm else []
+                else:
+                    alquist_candidates = alquist_pool
+
+                for alquist_candidate in alquist_candidates:
+                    if alquist_candidate is None:
+                        continue
+                    if not rules.rule3_no_same_object_consecutive_runs("Alquist", alquist_candidate[0]):
+                        continue
+                    if not rules.rule4_consecutive_object_same_performer("Alquist", alquist_candidate):
+                        continue
+                    if not rules.rule1_no_same_performer_both_positions(domin_candidate, alquist_candidate):
+                        continue
+                    if not rules.rule2_no_same_object_both_positions(domin_candidate, alquist_candidate):
+                        continue
+
+                    score = rules.score_permutation(
+                        domin_candidate,
+                        alquist_candidate,
+                        last_intermission_pair_performer,
+                        is_after_intermission,
+                        animatronic_perm,
+                    )
+                    if best_score is None or score > best_score:
+                        best_score = score
+                        best_pair = (domin_candidate, alquist_candidate)
+
+            if best_pair is None:
+                domin_candidate = domin_pool[domin_idx % len(domin_pool)]
+                alquist_candidate = alquist_pool[alquist_idx % len(alquist_pool)]
+                best_pair = (domin_candidate, alquist_candidate)
+
+            domin_perm, alquist_perm = best_pair
+
             domin_obj, domin_performer = domin_perm
             alquist_obj, alquist_performer = alquist_perm
             
@@ -204,10 +197,8 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
             row["Alquist"] = alquist_obj
             row["AlquistPerformer"] = alquist_performer
             
-            # Track in rules engine
             rules.record_run(domin_perm, alquist_perm)
 
-            # Add performer schedule entries
             for character in characters:
                 char_name = character["name"]
                 
@@ -239,7 +230,19 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
             domin_idx += 1
             alquist_idx += 1
 
-            # Add intermission
+            if (
+                intermission_every
+                and run_number % intermission_every == 0
+                and run_number != run_count
+            ):
+                if animatronic_perm:
+                    if domin_perm == animatronic_perm:
+                        last_intermission_pair_performer = alquist_performer
+                    elif alquist_perm == animatronic_perm:
+                        last_intermission_pair_performer = domin_performer
+                    else:
+                        last_intermission_pair_performer = None
+
             if (intermission_every and intermission_length and 
                 run_number % intermission_every == 0 and run_number != run_count):
                 

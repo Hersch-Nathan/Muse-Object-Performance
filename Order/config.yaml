@@ -2,7 +2,7 @@ show:
   name: "Assembled"
   runs_label: "Show Runs"
   start_time: "7:00 PM"
-  run_count: 24
+  run_count: 12
   step_minutes: 15
   intermission:
     every_n_runs: 6

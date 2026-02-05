@@ -30,28 +30,43 @@ This document defines the rules for valid show order scheduling.
 
 **Rule 1: No Same Performer in Both Positions**
 - A performer cannot appear in both Domin AND Alquist in the same run
-- Example: ❌ Run 2 has Shirt,Luca AND Muppet,Luca
+- Example: Run 2 has Shirt,Luca AND Muppet,Luca
 - Applies to: Every run
 
 **Rule 2: No Same Object in Both Positions**
 - An object cannot appear in both Domin AND Alquist in the same run
-- Example: ❌ Run with Shirt,Moose AND Shirt,Luca
+- Example: Run with Shirt,Moose AND Shirt,Luca
 - Applies to: Every run
 
 **Rule 3: No Same Object in Same Position Across Consecutive Runs**
 - Same object cannot appear in same position (Domin or Alquist) in back-to-back runs
-- Example: ❌ Run 1 Domin=Shirt, Run 2 Domin=Shirt
+- Example: Run 1 Domin=Shirt, Run 2 Domin=Shirt
 - Applies to: All consecutive run pairs
+
+**Rule 4: Consecutive Object Switch Keeps Performer**
+- If an object appears in consecutive runs but switches positions, the performer must stay the same
+- Example: Run N Alquist=Shirt,Moose → Run N+1 Domin=Shirt,Moose
+- Example: Run N Alquist=Shirt,Moose → Run N+1 Domin=Shirt,Luca
 
 ### SOFT RULES (Prefer But Fallback if Needed)
 
-**Rule 4: Gap Preference for (Object, Performer) Pairs**
+**Rule 5: Performer Balance Across Characters and Objects**
+- Performers (excluding "None") should appear about the same number of times
+	- as Domin vs Alquist
+	- on each object
+- Prefer assignments that reduce imbalance over time
+
+**Rule 6: Intermission Partner Variety**
+- When Animatronic appears before and after an intermission, the performer paired with it should change
+- Prefer a different performer paired against Animatronic across the boundary
+
+**Rule 7: Gap Preference for (Object, Performer) Pairs**
 - Gap of 2+ runs: Preferred (best score)
 - Gap of 1 run: Acceptable (lower score)
 - Gap of 0 (consecutive): Only if no other option exists
 - Example: Shirt,Moose in Run 1, can appear again in Run 4+ (gap=2)
 
-**Rule 5: Intermission Breaks (None_Before_After)**
+**Rule 8: Intermission Breaks (None_Before_After)**
 - Try to place Animatronic at intermission boundaries
 - Before intermission: One position gets Animatronic
 - After intermission: Other position gets Animatronic
@@ -59,5 +74,5 @@ This document defines the rules for valid show order scheduling.
 
 ## Implementation Order
 
-User will specify the order to implement rules 1-5 in generate_schedule.py
+User will specify the order to implement rules 1-8 in generate_schedule.py
 

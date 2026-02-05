@@ -6,7 +6,6 @@ This directory contains tools for generating performance schedules for the show.
 
 - `config.yaml` - Configuration file with show settings, characters, performers, and objects
 - `generate_schedule.py` - Python script that generates CSV schedules from config with constraint validation
-- `validate_schedule.py` - Validation script to check schedule compliance with all rules
 - `show_order.csv` - Master schedule showing all runs with object-performer assignments
 - `show_order.tex` - LaTeX document that imports CSVs and generates the PDF
 - `show_order.pdf` - Final PDF output with master schedule and per-performer schedules
@@ -20,11 +19,7 @@ To regenerate all schedules and the PDF:
 python3 generate_schedule.py && pdflatex -interaction=nonstopmode show_order.tex
 ```
 
-To validate the schedule against all constraint rules:
-
-```bash
-python3 validate_schedule.py
-```
+To verify the schedule, inspect show_order.csv and performer schedules after generation.
 
 ## Configuration
 
@@ -72,8 +67,10 @@ The scheduling algorithm respects the following rules:
 3. **No Duplicate Object in Run** - The same object cannot appear in both positions in the same run
 
 **Soft Rules (Preferred):**
-4. **Gap Preference** - Prefer a gap of at least 2 runs between the same permutation in the same position. If impossible, allow a gap of 1. Consecutive assignments only allowed when absolutely necessary (but hard rules prevent this)
-5. **Intermission Breaks** - Try to place Animatronic at intermission boundaries (before and after). If constraints prevent placing both, try at least one. Falls back gracefully if neither is possible.
+4. **Performer Balance** - Keep each performer balanced across Domin and Alquist and across objects
+5. **Intermission Partner Variety** - When Animatronic appears before and after intermission, prefer a different paired performer across the boundary
+6. **Gap Preference** - Prefer a gap of at least 2 runs between the same permutation in the same position. If impossible, allow a gap of 1. Consecutive assignments only allowed when absolutely necessary (but hard rules prevent this)
+7. **Intermission Breaks** - Try to place Animatronic at intermission boundaries (before and after). If constraints prevent placing both, try at least one. Falls back gracefully if neither is possible.
 
 ### Algorithm
 For each run:

@@ -1,0 +1,37 @@
+\documentclass{article}
+\usepackage{datatool}
+\usepackage[margin=1in]{geometry}
+
+\DTLloaddb[
+  keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer}
+]{showorder}{show_order.csv}
+
+\begin{document}
+
+\section*{Show Name}
+Show Runs
+
+\bigskip
+
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+Run & Time & Domin & Performer & Alquist & Performer \\
+\hline
+\DTLforeach{showorder}{
+  \Run=Run,
+  \Time=Time,
+  \Domin=Domin,
+  \DominPerformer=DominPerformer,
+  \Alquist=Alquist,
+  \AlquistPerformer=AlquistPerformer
+}{%
+  \DTLifstringequal{\Run}{Intermission}{%
+    \multicolumn{6}{|c|}{Intermission (starts at \Time)} \\
+  }{%
+    \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+  }%
+  \hline
+}
+\end{tabular}
+
+\end{document}

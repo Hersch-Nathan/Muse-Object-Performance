@@ -7,6 +7,7 @@ show:
   intermission:
     every_n_runs: 6
     length_minutes: 10
+  random_seed: null  # Set to a number for reproducible random start, null for no randomization
 
 characters:
   - name: "Domin"
@@ -22,10 +23,10 @@ performers:
 
 objects:
   - name: "Shirt"
-    performer: "Moose"
+    performers: ["all"]  # "all" or list of performer names
   - name: "Muppet"
-    performer: "Luca"
+    performers: ["all"]
   - name: "Animatronic"
-    performer: "None"
+    performers: ["None"]
   - name: "Robot"
-    performer: "Luca"
+    performers: ["all"]

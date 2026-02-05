@@ -1,5 +1,6 @@
 import csv
 import os
+import random
 from datetime import datetime, timedelta
 
 try:
@@ -46,6 +47,12 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     show = config["show"]
     characters = config["characters"]
     objects = config["objects"]
+    all_performers = config.get("performers", [])
+
+    # Expand "all" in object performers
+    for obj in objects:
+        if obj.get("performers") == ["all"]:
+            obj["performers"] = all_performers.copy()
 
     run_count = int(show["run_count"])
     step_minutes = int(show["step_minutes"])
@@ -53,11 +60,24 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     intermission_every = int(intermission.get("every_n_runs", 0) or 0)
     intermission_length = int(intermission.get("length_minutes", 0) or 0)
 
+    # Handle random seed
+    random_seed = show.get("random_seed")
+    if random_seed is not None:
+        random.seed(random_seed)
+        initial_object_index = random.randint(0, len(objects) - 1)
+    else:
+        initial_object_index = 0
+
     start_time = parse_time(show["start_time"])
     current_time = start_time
 
     performer_rows: dict[str, list[dict]] = {
-        name: [] for name in config.get("performers", []) if name != "None"
+        name: [] for name in all_performers if name != "None"
+    }
+
+    # Track performer usage counts (excluding None)
+    performer_counts: dict[str, int] = {
+        name: 0 for name in all_performers if name != "None"
     }
 
     master_rows: list[dict] = []
@@ -71,9 +91,24 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
         for char_index, character in enumerate(characters):
             char_name = character["name"]
-            obj = objects[(run_index + char_index) % len(objects)]
+            obj_index = (initial_object_index + run_index + char_index) % len(objects)
+            obj = objects[obj_index]
             obj_name = obj["name"]
-            performer = obj.get("performer", "None") or "None"
+            
+            # Get available performers for this object
+            available_performers = obj.get("performers", ["None"])
+            
+            # Choose performer with fewest appearances (balanced assignment)
+            if "None" in available_performers:
+                performer = "None"
+            else:
+                # Filter to real performers and find the one with minimum count
+                valid_performers = [p for p in available_performers if p in performer_counts]
+                if valid_performers:
+                    performer = min(valid_performers, key=lambda p: performer_counts[p])
+                    performer_counts[performer] += 1
+                else:
+                    performer = "None"
 
             row[char_name] = obj_name
             row[f"{char_name}Performer"] = performer

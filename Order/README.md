@@ -53,24 +53,28 @@ Define objects and their allowed performers:
 
 ## How It Works
 
-### Segment-Based Scheduling
-- Runs are divided into segments based on `intermission_every`
-- Each segment gets its own shuffled permutation pool for maximum variety across the show
-- Within each segment, Domin and Alquist cycle through the pool with an offset (Alquist starts 1 position ahead)
+### Object Pair Sequencing
+- Build a full sequence of ordered object pairs (Domin object, Alquist object)
+- Enforce even distribution across the full schedule and avoid consecutive repeats or full swaps
+- After object pairs are fixed, assign performers using hard rules and soft scoring
 
 ### Constraint-Based Assignment
 The scheduling algorithm respects the following rules:
 
 **Hard Rules (Must Never Violate):**
-1. **No Consecutive Same Permutation** - The same (object, performer) pair cannot appear consecutively in the same position (Domin or Alquist) in consecutive runs
-2. **No Duplicate Permutation in Run** - The same (object, performer) pair cannot appear in both Domin and Alquist positions in the same run
-3. **No Duplicate Object in Run** - The same object cannot appear in both positions in the same run
+1. **No Same Performer in Both Positions** - A performer cannot appear in both Domin and Alquist in the same run
+2. **No Same Object in Both Positions** - An object cannot appear in both Domin and Alquist in the same run
+3. **No Same Object in Same Position Across Consecutive Runs** - The same object cannot appear in the same position in back-to-back runs
+4. **Consecutive Object Switch Keeps Performer** - If an object switches positions between consecutive runs, the performer must stay the same
+5. **Object Pairing Distribution** - Ordered object pairs (Domin object, Alquist object) are distributed as evenly as possible across the full schedule
+6. **No Full Object Swap Across Consecutive Runs** - If Run N has Domin=A and Alquist=B, Run N+1 cannot be Domin=B and Alquist=A
 
 **Soft Rules (Preferred):**
-4. **Performer Balance** - Keep each performer balanced across Domin and Alquist and across objects
-5. **Intermission Partner Variety** - When Animatronic appears before and after intermission, prefer a different paired performer across the boundary
-6. **Gap Preference** - Prefer a gap of at least 2 runs between the same permutation in the same position. If impossible, allow a gap of 1. Consecutive assignments only allowed when absolutely necessary (but hard rules prevent this)
-7. **Intermission Breaks** - Try to place Animatronic at intermission boundaries (before and after). If constraints prevent placing both, try at least one. Falls back gracefully if neither is possible.
+7. **Performer Balance** - Keep each performer balanced across Domin and Alquist and across objects
+8. **Intermission Partner Variety** - When Animatronic appears before and after intermission, prefer a different paired performer across the boundary
+9. **Gap Preference** - Prefer a gap of at least 2 runs between the same permutation in the same position. If impossible, allow a gap of 1. Consecutive assignments only allowed when absolutely necessary (but hard rules prevent this). Intermission rows do not count as runs when calculating gaps.
+10. **Intermission Breaks** - Try to place Animatronic at intermission boundaries (before and after). If constraints prevent placing both, try at least one. Falls back gracefully if neither is possible.
+11. **Avoid None on First/Last Run** - Prefer runs 1 and R to use real performers (no "None")
 
 ### Algorithm
 For each run:

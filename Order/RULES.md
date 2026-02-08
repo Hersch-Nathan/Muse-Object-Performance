@@ -48,29 +48,43 @@ This document defines the rules for valid show order scheduling.
 - Example: Run N Alquist=Shirt,Moose → Run N+1 Domin=Shirt,Moose
 - Example: Run N Alquist=Shirt,Moose → Run N+1 Domin=Shirt,Luca
 
+**Rule 5: Object Pairing Distribution**
+- Count permutations as ordered object pairs (Domin object, Alquist object)
+- Let $P = N \times (N - 1)$ where $N$ is the number of objects
+- Over the full schedule, each permutation should appear either $\lfloor R/P \rfloor$ or $\lceil R/P \rceil$ times
+- Exactly $R \bmod P$ permutations appear $\lceil R/P \rceil$ times
+- Example: $N=4 \Rightarrow P=12$, $R=23$ runs → 11 permutations appear 2 times, 1 permutation appears 1 time
+
+**Rule 6: No Full Object Swap Across Consecutive Runs**
+- If Run N has Domin=A and Alquist=B, then Run N+1 cannot be Domin=B and Alquist=A
+
 ### SOFT RULES (Prefer But Fallback if Needed)
 
-**Rule 5: Performer Balance Across Characters and Objects**
+**Rule 7: Performer Balance Across Characters and Objects**
 - Performers (excluding "None") should appear about the same number of times
 	- as Domin vs Alquist
 	- on each object
 - Prefer assignments that reduce imbalance over time
 
-**Rule 6: Intermission Partner Variety**
+**Rule 8: Intermission Partner Variety**
 - When Animatronic appears before and after an intermission, the performer paired with it should change
 - Prefer a different performer paired against Animatronic across the boundary
 
-**Rule 7: Gap Preference for (Object, Performer) Pairs**
+**Rule 9: Gap Preference for (Object, Performer) Pairs**
 - Gap of 2+ runs: Preferred (best score)
 - Gap of 1 run: Acceptable (lower score)
 - Gap of 0 (consecutive): Only if no other option exists
+- Intermission rows do not count as runs when calculating gaps
 - Example: Shirt,Moose in Run 1, can appear again in Run 4+ (gap=2)
 
-**Rule 8: Intermission Breaks (None_Before_After)**
+**Rule 10: Intermission Breaks (None_Before_After)**
 - Try to place Animatronic at intermission boundaries
 - Before intermission: One position gets Animatronic
 - After intermission: Other position gets Animatronic
 - Soft rule: Skip if hard rules would be violated
+
+**Rule 11: Avoid None on First/Last Run**
+- Prefer runs 1 and $R$ to use real performers (no "None")
 
 ## Implementation Order
 

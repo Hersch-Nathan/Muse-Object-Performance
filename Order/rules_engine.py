@@ -6,19 +6,41 @@ from typing import Tuple, List, Dict
 class RulesEngine:
     """Validates and scores permutation assignments against scheduling rules."""
 
-    def __init__(self, performers: List[str], objects: List[str], run_history: List[Dict] = None):
+    def __init__(
+        self,
+        performers: List[str],
+        objects: List[str],
+        total_runs: int,
+        run_history: List[Dict] = None,
+    ):
         """
         Initialize rules engine with optional run history for context.
-        
+
         Args:
             performers: List of performer names (excluding "None")
             objects: List of object names
+            total_runs: Total number of scheduled runs
             run_history: List of dicts like {"Domin": (obj, performer), "Alquist": (obj, performer)}
         """
         self.performers = [p for p in performers if p != "None"]
         self.objects = objects
+        self.total_runs = total_runs
         self.run_history = run_history or []
         self._init_counts()
+
+        self.object_pairs = [
+            (domin_obj, alquist_obj)
+            for domin_obj in self.objects
+            for alquist_obj in self.objects
+            if domin_obj != alquist_obj
+        ]
+        self.object_pair_counts = {pair: 0 for pair in self.object_pairs}
+        if self.object_pairs:
+            self.object_pair_base = self.total_runs // len(self.object_pairs)
+            self.object_pair_remainder = self.total_runs % len(self.object_pairs)
+        else:
+            self.object_pair_base = 0
+            self.object_pair_remainder = 0
 
     def _init_counts(self) -> None:
         """Initialize performer counts for characters and objects."""
@@ -35,7 +57,7 @@ class RulesEngine:
             self._apply_counts(run["Alquist"], "Alquist")
 
     def _apply_counts(self, perm: Tuple[str, str], position: str) -> None:
-        """Apply a permutation to counts (ignores performer None)."""
+        """Apply a permutation to counts."""
         obj, performer = perm
         if performer == "None":
             return
@@ -131,8 +153,72 @@ class RulesEngine:
 
         return True
 
+    def rule5_object_pair_distribution(
+        self, domin_obj: str, alquist_obj: str, remaining_runs: int
+    ) -> bool:
+        if not self.object_pairs:
+            return True
+
+        pair = (domin_obj, alquist_obj)
+        if pair not in self.object_pair_counts:
+            return True
+
+        base = self.object_pair_base
+        remainder = self.object_pair_remainder
+        current = self.object_pair_counts[pair]
+        new_count = current + 1
+
+        if new_count > base + 1:
+            return False
+
+        extra_used = 0
+        for count in self.object_pair_counts.values():
+            if count > base:
+                extra_used += count - base
+        if current >= base:
+            extra_used += 1
+
+        if extra_used > remainder:
+            return False
+
+        required_min = 0
+        for key, count in self.object_pair_counts.items():
+            if key == pair:
+                count = new_count
+            if count < base:
+                required_min += base - count
+
+        if required_min > remaining_runs:
+            return False
+
+        extra_needed = remainder - extra_used
+        available_slots = remaining_runs - required_min
+        if available_slots < extra_needed:
+            return False
+
+        return True
+
+    def rule6_no_full_object_swap(
+        self, domin_obj: str, alquist_obj: str
+    ) -> bool:
+        if not self.run_history:
+            return True
+
+        last_run = self.run_history[-1]
+        last_domin_obj, _ = last_run["Domin"]
+        last_alquist_obj, _ = last_run["Alquist"]
+
+        if domin_obj == last_alquist_obj and alquist_obj == last_domin_obj:
+            return False
+
+        return True
+
     def all_hard_rules(
-        self, domin_perm: Tuple[str, str], alquist_perm: Tuple[str, str], position_being_checked: str = None
+        self,
+        domin_perm: Tuple[str, str],
+        alquist_perm: Tuple[str, str],
+        position_being_checked: str = None,
+        remaining_runs: int | None = None,
     ) -> Tuple[bool, str]:
         """
         Check all hard rules.
@@ -162,14 +248,21 @@ class RulesEngine:
             return False, "Rule 4: Domin object switched from other position with different performer"
         if not self.rule4_consecutive_object_same_performer("Alquist", alquist_perm):
             return False, "Rule 4: Alquist object switched from other position with different performer"
+
+        if remaining_runs is not None:
+            if not self.rule5_object_pair_distribution(domin_obj, alquist_obj, remaining_runs):
+                return False, "Rule 5: Object pairing distribution out of bounds"
+
+        if not self.rule6_no_full_object_swap(domin_obj, alquist_obj):
+            return False, "Rule 6: Full object swap across consecutive runs"
         
         return True, ""
 
-    def rule4_gap_preference(
+    def rule8_gap_preference(
         self, perm: Tuple[str, str], position: str
     ) -> int:
         """
-        Rule 4: Prefer gap of 2+ between same (object, performer) pair in same position.
+        Rule 8: Prefer gap of 2+ between same (object, performer) pair in same position.
         
         Args:
             perm: (object, performer) tuple
@@ -192,6 +285,15 @@ class RulesEngine:
                     return 10
         
         return 100
+
+    def _end_run_none_penalty(
+        self, domin_perm: Tuple[str, str], alquist_perm: Tuple[str, str], run_number: int
+    ) -> int:
+        if run_number not in (1, self.total_runs):
+            return 0
+        if domin_perm[1] == "None" or alquist_perm[1] == "None":
+            return 5
+        return 0
 
     def _balance_penalty(self, domin_perm: Tuple[str, str], alquist_perm: Tuple[str, str]) -> int:
         temp_char = {
@@ -258,6 +360,7 @@ class RulesEngine:
         last_intermission_pair_performer: str | None = None,
         is_after_intermission: bool = False,
         animatronic_perm: Tuple[str, str] | None = None,
+        run_number: int | None = None,
     ) -> int:
         """
         Score a permutation pair based on soft rules.
@@ -265,8 +368,8 @@ class RulesEngine:
         Returns:
             Higher is better. Combines gap preference and balance penalty.
         """
-        domin_score = self.rule4_gap_preference(domin_perm, "Domin")
-        alquist_score = self.rule4_gap_preference(alquist_perm, "Alquist")
+        domin_score = self.rule8_gap_preference(domin_perm, "Domin")
+        alquist_score = self.rule8_gap_preference(alquist_perm, "Alquist")
         gap_score = (domin_score + alquist_score) // 2
 
         balance_penalty = self._balance_penalty(domin_perm, alquist_perm)
@@ -278,7 +381,13 @@ class RulesEngine:
             animatronic_perm,
         )
 
-        return (gap_score * 10) - balance_penalty - intermission_penalty
+        end_run_penalty = 0
+        if run_number is not None:
+            end_run_penalty = self._end_run_none_penalty(
+                domin_perm, alquist_perm, run_number
+            )
+
+        return (gap_score * 10) - balance_penalty - intermission_penalty - end_run_penalty
 
     def record_run(self, domin_perm: Tuple[str, str], alquist_perm: Tuple[str, str]) -> None:
         """
@@ -294,6 +403,10 @@ class RulesEngine:
         })
         self._apply_counts(domin_perm, "Domin")
         self._apply_counts(alquist_perm, "Alquist")
+
+        pair = (domin_perm[0], alquist_perm[0])
+        if pair in self.object_pair_counts:
+            self.object_pair_counts[pair] += 1
 
     def reset(self) -> None:
         """Reset run history (for new segment)."""

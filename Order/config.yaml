@@ -3,7 +3,7 @@ show:
   runs_label: "Show Runs"
   start_time: "7:00 PM"
   run_count: 12
-  step_minutes: 15
+  step_minutes: 14
   intermission:
     every_n_runs: 6
     length_minutes: 10

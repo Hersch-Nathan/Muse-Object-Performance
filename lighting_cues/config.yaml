@@ -1,0 +1,41 @@
+output_csv: lighting_cues.csv
+
+objects:
+  - Shirt
+  - Muppet
+  - Animatronic
+  - Robot
+
+cue_types:
+  general:
+    - Preshow
+    - Blackout
+  single:
+    - Base
+    - Bump
+    - Believe
+    - Servent Look
+    - Red
+    - Dim Blue
+  double:
+    - A+B
+    -  A+B colored
+    - half A+B
+    - half A+B colored
+
+
+numbering:
+  general_base: 0
+  single_bases:
+    Shirt: 1
+    Muppet: 2
+    Animatronic: 3
+    Robot: 4
+  double_bases:
+    Shirt: 5
+    Muppet: 6
+    Animatronic: 7
+    Robot: 8
+
+bump_types:
+  - Bump

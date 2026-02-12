@@ -1,4 +1,7 @@
-output_csv: lighting_cues.csv
+base_q_csv: lightingcues.csv
+output_eos_csv: eoslightingcues.csv
+output_qlab_csv: qlablightingcue.csv
+output_permutation_csv: permutation_numbers.csv
 
 objects:
   - Shirt
@@ -14,15 +17,14 @@ cue_types:
     - Base
     - Bump
     - Believe
-    - Servent Look
+    - Servant Look
     - Red
     - Dim Blue
   double:
     - A+B
-    -  A+B colored
+    - A+B colored
     - half A+B
     - half A+B colored
-
 
 numbering:
   general_base: 0
@@ -39,3 +41,71 @@ numbering:
 
 bump_types:
   - Bump
+
+intensity_palettes:
+  - Base
+  - Bump
+  - Half
+  - Dim
+
+color_palettes:
+  - Base
+  - Believer
+  - Color
+  - Servant
+  - Red
+  - Dim Blue
+
+typo_fixes:
+  Beliver: Believer
+  Servent: Servant
+  Aluist: Alquist
+
+cue_type_keywords:
+  general:
+    - keywords: ["preshow"]
+      cue_type: Preshow
+    - keywords: ["blackout"]
+      cue_type: Blackout
+  single:
+    - keywords: ["bump"]
+      cue_type: Bump
+    - keywords: ["believer"]
+      cue_type: Believe
+    - keywords: ["servant"]
+      cue_type: Servant Look
+    - keywords: ["red"]
+      cue_type: Red
+    - keywords: ["dim blue"]
+      cue_type: Dim Blue
+  double:
+    - keywords: ["half", "colored"]
+      cue_type: half A+B colored
+    - keywords: ["half"]
+      cue_type: half A+B
+    - keywords: ["colored"]
+      cue_type: A+B colored
+
+intensity_keywords:
+  - keyword: bump
+    palette: Bump
+  - keyword: half
+    palette: Half
+  - keyword: dim
+    palette: Dim
+
+color_keywords:
+  - keyword: believer
+    palette: Believer
+  - keyword: believe
+    palette: Believer
+  - keyword: servant
+    palette: Servant
+  - keyword: red
+    palette: Red
+  - keyword: dim blue
+    palette: Dim Blue
+  - keyword: color
+    palette: Color
+  - keyword: colored
+    palette: Color

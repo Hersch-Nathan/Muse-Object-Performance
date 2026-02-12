@@ -1,0 +1,79 @@
+Q,Name,Intensity Palette Number,Intensity Palette,Color Palette Number,Color Palette
+001,General Preshow,,,,
+002,General Blackout,,,,
+101,Shirt Base,101,Shirt Base,101,Shirt Base
+102,Shirt Bump,102,Shirt Bump,101,Shirt Base
+102.1,Shirt Bump Return,102,Shirt Bump,101,Shirt Base
+103,Shirt Believe,101,Shirt Base,102,Shirt Believer
+104,Shirt Servant Look,101,Shirt Base,104,Shirt Servant
+105,Shirt Red,101,Shirt Base,105,Shirt Red
+106,Shirt Dim Blue,104,Shirt Dim,106,Shirt Dim Blue
+201,Muppet Base,201,Muppet Base,201,Muppet Base
+202,Muppet Bump,202,Muppet Bump,201,Muppet Base
+202.1,Muppet Bump Return,202,Muppet Bump,201,Muppet Base
+203,Muppet Believe,201,Muppet Base,202,Muppet Believer
+204,Muppet Servant Look,201,Muppet Base,204,Muppet Servant
+205,Muppet Red,201,Muppet Base,205,Muppet Red
+206,Muppet Dim Blue,204,Muppet Dim,206,Muppet Dim Blue
+301,Animatronic Base,301,Animatronic Base,301,Animatronic Base
+302,Animatronic Bump,302,Animatronic Bump,301,Animatronic Base
+302.1,Animatronic Bump Return,302,Animatronic Bump,301,Animatronic Base
+303,Animatronic Believe,301,Animatronic Base,302,Animatronic Believer
+304,Animatronic Servant Look,301,Animatronic Base,304,Animatronic Servant
+305,Animatronic Red,301,Animatronic Base,305,Animatronic Red
+306,Animatronic Dim Blue,304,Animatronic Dim,306,Animatronic Dim Blue
+401,Robot Base,401,Robot Base,401,Robot Base
+402,Robot Bump,402,Robot Bump,401,Robot Base
+402.1,Robot Bump Return,402,Robot Bump,401,Robot Base
+403,Robot Believe,401,Robot Base,402,Robot Believer
+404,Robot Servant Look,401,Robot Base,404,Robot Servant
+405,Robot Red,401,Robot Base,405,Robot Red
+406,Robot Dim Blue,404,Robot Dim,406,Robot Dim Blue
+521,Shirt+Muppet,101 + 201,Shirt Base + Muppet Base,101 + 201,Shirt Base + Muppet Base
+522,Shirt+Muppet colored,101 + 201,Shirt Base + Muppet Base,105 + 205,Shirt Red + Muppet Red
+523,half Shirt+Muppet,103 + 203,Shirt Half + Muppet Half,101 + 201,Shirt Base + Muppet Base
+524,half Shirt+Muppet colored,103 + 203,Shirt Half + Muppet Half,105 + 205,Shirt Red + Muppet Red
+531,Shirt+Animatronic,101 + 301,Shirt Base + Animatronic Base,101 + 301,Shirt Base + Animatronic Base
+532,Shirt+Animatronic colored,101 + 301,Shirt Base + Animatronic Base,105 + 305,Shirt Red + Animatronic Red
+533,half Shirt+Animatronic,103 + 303,Shirt Half + Animatronic Half,101 + 301,Shirt Base + Animatronic Base
+534,half Shirt+Animatronic colored,103 + 303,Shirt Half + Animatronic Half,105 + 305,Shirt Red + Animatronic Red
+541,Shirt+Robot,101 + 401,Shirt Base + Robot Base,101 + 401,Shirt Base + Robot Base
+542,Shirt+Robot colored,101 + 401,Shirt Base + Robot Base,105 + 405,Shirt Red + Robot Red
+543,half Shirt+Robot,103 + 403,Shirt Half + Robot Half,101 + 401,Shirt Base + Robot Base
+544,half Shirt+Robot colored,103 + 403,Shirt Half + Robot Half,105 + 405,Shirt Red + Robot Red
+611,Muppet+Shirt,201 + 101,Muppet Base + Shirt Base,201 + 101,Muppet Base + Shirt Base
+612,Muppet+Shirt colored,201 + 101,Muppet Base + Shirt Base,205 + 105,Muppet Red + Shirt Red
+613,half Muppet+Shirt,203 + 103,Muppet Half + Shirt Half,201 + 101,Muppet Base + Shirt Base
+614,half Muppet+Shirt colored,203 + 103,Muppet Half + Shirt Half,205 + 105,Muppet Red + Shirt Red
+631,Muppet+Animatronic,201 + 301,Muppet Base + Animatronic Base,201 + 301,Muppet Base + Animatronic Base
+632,Muppet+Animatronic colored,201 + 301,Muppet Base + Animatronic Base,205 + 305,Muppet Red + Animatronic Red
+633,half Muppet+Animatronic,203 + 303,Muppet Half + Animatronic Half,201 + 301,Muppet Base + Animatronic Base
+634,half Muppet+Animatronic colored,203 + 303,Muppet Half + Animatronic Half,205 + 305,Muppet Red + Animatronic Red
+641,Muppet+Robot,201 + 401,Muppet Base + Robot Base,201 + 401,Muppet Base + Robot Base
+642,Muppet+Robot colored,201 + 401,Muppet Base + Robot Base,205 + 405,Muppet Red + Robot Red
+643,half Muppet+Robot,203 + 403,Muppet Half + Robot Half,201 + 401,Muppet Base + Robot Base
+644,half Muppet+Robot colored,203 + 403,Muppet Half + Robot Half,205 + 405,Muppet Red + Robot Red
+711,Animatronic+Shirt,301 + 101,Animatronic Base + Shirt Base,301 + 101,Animatronic Base + Shirt Base
+712,Animatronic+Shirt colored,301 + 101,Animatronic Base + Shirt Base,305 + 105,Animatronic Red + Shirt Red
+713,half Animatronic+Shirt,303 + 103,Animatronic Half + Shirt Half,301 + 101,Animatronic Base + Shirt Base
+714,half Animatronic+Shirt colored,303 + 103,Animatronic Half + Shirt Half,305 + 105,Animatronic Red + Shirt Red
+721,Animatronic+Muppet,301 + 201,Animatronic Base + Muppet Base,301 + 201,Animatronic Base + Muppet Base
+722,Animatronic+Muppet colored,301 + 201,Animatronic Base + Muppet Base,305 + 205,Animatronic Red + Muppet Red
+723,half Animatronic+Muppet,303 + 203,Animatronic Half + Muppet Half,301 + 201,Animatronic Base + Muppet Base
+724,half Animatronic+Muppet colored,303 + 203,Animatronic Half + Muppet Half,305 + 205,Animatronic Red + Muppet Red
+741,Animatronic+Robot,301 + 401,Animatronic Base + Robot Base,301 + 401,Animatronic Base + Robot Base
+742,Animatronic+Robot colored,301 + 401,Animatronic Base + Robot Base,305 + 405,Animatronic Red + Robot Red
+743,half Animatronic+Robot,303 + 403,Animatronic Half + Robot Half,301 + 401,Animatronic Base + Robot Base
+744,half Animatronic+Robot colored,303 + 403,Animatronic Half + Robot Half,305 + 405,Animatronic Red + Robot Red
+811,Robot+Shirt,401 + 101,Robot Base + Shirt Base,401 + 101,Robot Base + Shirt Base
+812,Robot+Shirt colored,401 + 101,Robot Base + Shirt Base,405 + 105,Robot Red + Shirt Red
+813,half Robot+Shirt,403 + 103,Robot Half + Shirt Half,401 + 101,Robot Base + Shirt Base
+814,half Robot+Shirt colored,403 + 103,Robot Half + Shirt Half,405 + 105,Robot Red + Shirt Red
+821,Robot+Muppet,401 + 201,Robot Base + Muppet Base,401 + 201,Robot Base + Muppet Base
+822,Robot+Muppet colored,401 + 201,Robot Base + Muppet Base,405 + 205,Robot Red + Muppet Red
+823,half Robot+Muppet,403 + 203,Robot Half + Muppet Half,401 + 201,Robot Base + Muppet Base
+824,half Robot+Muppet colored,403 + 203,Robot Half + Muppet Half,405 + 205,Robot Red + Muppet Red
+831,Robot+Animatronic,401 + 301,Robot Base + Animatronic Base,401 + 301,Robot Base + Animatronic Base
+832,Robot+Animatronic colored,401 + 301,Robot Base + Animatronic Base,405 + 305,Robot Red + Animatronic Red
+833,half Robot+Animatronic,403 + 303,Robot Half + Animatronic Half,401 + 301,Robot Base + Animatronic Base
+834,half Robot+Animatronic colored,403 + 303,Robot Half + Animatronic Half,405 + 305,Robot Red + Animatronic Red

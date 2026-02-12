@@ -1,0 +1,13 @@
+Permutation,Object A,Object B
+52,Shirt,Muppet
+53,Shirt,Animatronic
+54,Shirt,Robot
+61,Muppet,Shirt
+63,Muppet,Animatronic
+64,Muppet,Robot
+71,Animatronic,Shirt
+72,Animatronic,Muppet
+74,Animatronic,Robot
+81,Robot,Shirt
+82,Robot,Muppet
+83,Robot,Animatronic

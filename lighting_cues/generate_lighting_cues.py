@@ -384,10 +384,16 @@ def build_permutation_rows(objects: list[str], numbering: dict) -> list[dict]:
     return rows
 
 
-def write_csv(path: str, rows: list[dict], headers: list[str]) -> None:
+def write_csv(
+    path: str,
+    rows: list[dict],
+    headers: list[str],
+    include_header: bool = True,
+) -> None:
     with open(path, "w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=headers)
-        writer.writeheader()
+        if include_header:
+            writer.writeheader()
         writer.writerows(rows)
 
 
@@ -406,7 +412,8 @@ def main() -> None:
     permutation_rows = build_permutation_rows(config["objects"], config["numbering"])
 
     write_csv(eos_output, eos_rows, EOS_HEADERS)
-    write_csv(qlab_output, qlab_rows, QLAB_HEADERS)
+    qlab_include_header = config.get("qlab_include_header", False)
+    write_csv(qlab_output, qlab_rows, QLAB_HEADERS, include_header=qlab_include_header)
     write_csv(permutation_output, permutation_rows, PERMUTATION_HEADERS)
 
 

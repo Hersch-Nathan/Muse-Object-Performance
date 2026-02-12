@@ -1,6 +1,7 @@
 base_q_csv: lightingcues.csv
 output_eos_csv: eoslightingcues.csv
 output_qlab_csv: qlablightingcue.csv
+qlab_include_header: false
 output_permutation_csv: permutation_numbers.csv
 
 objects:

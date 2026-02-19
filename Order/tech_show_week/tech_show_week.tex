@@ -1,0 +1,114 @@
+\documentclass{article}
+\usepackage{datatool}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable}
+\usepackage{draftwatermark}
+\SetWatermarkText{DRAFT}
+\SetWatermarkScale{3}
+
+\DTLloaddb[
+	keys={Run,SceneA,SceneB,Notes}
+]{generalshoworder}{general_show_order.csv}
+
+\DTLloaddb[
+	keys={Day,Time,Event,Notes}
+]{weektimeline}{week_timeline.csv}
+
+\DTLloaddb[
+	keys={Day,CallType,Time,Notes}
+]{moosecalls}{performers/moose.csv}
+
+\DTLloaddb[
+	keys={Day,CallType,Time,Notes}
+]{lucacalls}{performers/luca.csv}
+
+\begin{document}
+
+\section*{Object Performance}
+Tech/Show Week Schedule (February 23-28, 2026)
+
+\bigskip
+
+\subsection*{General Show Order}
+
+\begin{longtable}{|l|l|l|p{2.8in}|}
+\hline
+\textbf{Run} & \textbf{Scene A} & \textbf{Scene B} & \textbf{Notes} \\
+\hline
+\endhead
+\hline
+\endfoot
+\DTLforeach{generalshoworder}{
+	\Run=Run,
+	\SceneA=SceneA,
+	\SceneB=SceneB,
+	\Notes=Notes
+}{%
+	\Run & \SceneA & \SceneB & \Notes \\
+	\hline
+}
+\end{longtable}
+
+\subsection*{Week Timeline and Calls}
+
+\begin{longtable}{|l|l|l|p{2.6in}|}
+\hline
+\textbf{Day} & \textbf{Time} & \textbf{Event} & \textbf{Notes} \\
+\hline
+\endhead
+\hline
+\endfoot
+\DTLforeach{weektimeline}{
+	\Day=Day,
+	\Time=Time,
+	\Event=Event,
+	\Notes=Notes
+}{%
+	\Day & \Time & \Event & \Notes \\
+	\hline
+}
+\end{longtable}
+
+\newpage
+
+\subsection*{Moose Times and Calls}
+
+\begin{longtable}{|l|l|l|p{2.8in}|}
+\hline
+\textbf{Day} & \textbf{Call Type} & \textbf{Time} & \textbf{Notes} \\
+\hline
+\endhead
+\hline
+\endfoot
+\DTLforeach{moosecalls}{
+	\Day=Day,
+	\CallType=CallType,
+	\Time=Time,
+	\Notes=Notes
+}{%
+	\Day & \CallType & \Time & \Notes \\
+	\hline
+}
+\end{longtable}
+
+\subsection*{Luca Times and Calls}
+
+\begin{longtable}{|l|l|l|p{2.8in}|}
+\hline
+\textbf{Day} & \textbf{Call Type} & \textbf{Time} & \textbf{Notes} \\
+\hline
+\endhead
+\hline
+\endfoot
+\DTLforeach{lucacalls}{
+	\Day=Day,
+	\CallType=CallType,
+	\Time=Time,
+	\Notes=Notes
+}{%
+	\Day & \CallType & \Time & \Notes \\
+	\hline
+}
+\end{longtable}
+
+\end{document}

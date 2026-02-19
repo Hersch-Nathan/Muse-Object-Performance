@@ -2,10 +2,10 @@ title: "Object Performance - Tech/Show Week Schedule"
 date_range: "February 23-28, 2026"
 
 show_order:
-  - {run_label: "Run 1", scene_a: "Shirt", scene_b: "Muppet", notes: "Monday Q2Q sequence"}
-  - {run_label: "Run 2", scene_a: "Muppet", scene_b: "Shirt", notes: "Monday Q2Q sequence"}
-  - {run_label: "Run 3", scene_a: "Animatronic", scene_b: "Robot", notes: "Monday Q2Q sequence"}
-  - {run_label: "Run 4", scene_a: "Robot", scene_b: "Animatronic", notes: "Monday Q2Q sequence"}
+  - {run_label: "Run 1", scene_a: "Shirt", scene_b: "Muppet", notes: "work in show elements"}
+  - {run_label: "Run 2", scene_a: "Muppet", scene_b: "Shirt", notes: "work in show elements"}
+  - {run_label: "Run 3", scene_a: "Animatronic", scene_b: "Robot", notes: "work in show elements"}
+  - {run_label: "Run 4", scene_a: "Robot", scene_b: "Animatronic", notes: "work in show elements"}
   - {run_label: "Run 5", scene_a: "Order 12", scene_b: "Full Run", notes: "Tuesday 7:00 PM full run"}
 
 performers:

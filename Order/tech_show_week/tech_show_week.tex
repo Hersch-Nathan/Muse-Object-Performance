@@ -7,10 +7,6 @@
 \SetWatermarkScale{3}
 
 \DTLloaddb[
-  keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes}
-]{generalshoworder}{general_show_order.csv}
-
-\DTLloaddb[
   keys={Time,Event,Notes}
 ]{mondaytimeline}{days/monday_timeline.csv}
 \DTLloaddb[
@@ -67,30 +63,6 @@ Tech/Show Week Schedule (February 23-28, 2026)
 
 \bigskip
 
-\subsection*{General Show Order}
-
-\begin{longtable}{|l|l|l|l|l|l|p{1.7in}|}
-\hline
-\textbf{Run} & \textbf{Time} & \textbf{Domin} & \textbf{Performer} & \textbf{Alquist} & \textbf{Performer} & \textbf{Notes} \\
-\hline
-\endhead
-\hline
-\endfoot
-\DTLforeach{generalshoworder}{
-  \Run=Run,
-  \Time=Time,
-  \Domin=Domin,
-  \DominPerformer=DominPerformer,
-  \Alquist=Alquist,
-  \AlquistPerformer=AlquistPerformer,
-  \Notes=Notes
-}{%
-  \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer & \Notes \\
-  \hline
-}
-\end{longtable}
-
-\newpage
 \subsection*{Monday, Feb 23}
 \textbf{Day Schedule}
 \begin{longtable}{|l|l|p{3.8in}|}

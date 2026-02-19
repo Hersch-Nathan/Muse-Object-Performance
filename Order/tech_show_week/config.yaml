@@ -2,75 +2,75 @@ title: "Object Performance - Tech/Show Week Schedule"
 date_range: "February 23-28, 2026"
 
 show_order:
-	- {run_label: "Run 1", scene_a: "Shirt", scene_b: "Muppet", notes: "Monday Q2Q sequence"}
-	- {run_label: "Run 2", scene_a: "Muppet", scene_b: "Shirt", notes: "Monday Q2Q sequence"}
-	- {run_label: "Run 3", scene_a: "Animatronic", scene_b: "Robot", notes: "Monday Q2Q sequence"}
-	- {run_label: "Run 4", scene_a: "Robot", scene_b: "Animatronic", notes: "Monday Q2Q sequence"}
-	- {run_label: "Run 5", scene_a: "Order 12", scene_b: "Full Run", notes: "Tuesday 7:00 PM full run"}
+  - {run_label: "Run 1", scene_a: "Shirt", scene_b: "Muppet", notes: "Monday Q2Q sequence"}
+  - {run_label: "Run 2", scene_a: "Muppet", scene_b: "Shirt", notes: "Monday Q2Q sequence"}
+  - {run_label: "Run 3", scene_a: "Animatronic", scene_b: "Robot", notes: "Monday Q2Q sequence"}
+  - {run_label: "Run 4", scene_a: "Robot", scene_b: "Animatronic", notes: "Monday Q2Q sequence"}
+  - {run_label: "Run 5", scene_a: "Order 12", scene_b: "Full Run", notes: "Tuesday 7:00 PM full run"}
 
 performers:
-	moose:
-		display_name: "Moose"
-		calls:
-			- {day: "Monday, Feb 23", call_type: "Actor Call", time: "6:00 PM", notes: "Runs begin at 6:45 PM"}
-			- {day: "Tuesday, Feb 24", call_type: "Actor Call", time: "6:45 PM", notes: "Open stage 6:30-7:00 PM"}
-			- {day: "Wednesday, Feb 25", call_type: "Actor Call", time: "6:45 PM", notes: "Invited tech with professors"}
-			- {day: "Thursday, Feb 26", call_type: "Actor Call", time: "6:45 PM", notes: "Recorded for research project"}
-			- {day: "Friday, Feb 27", call_type: "Show Call", time: "6:30 PM", notes: "Show at 7:00 PM"}
-			- {day: "Saturday, Feb 28", call_type: "Show Call", time: "6:30 PM", notes: "Show at 7:00 PM"}
-	luca:
-		display_name: "Luca"
-		calls:
-			- {day: "Monday, Feb 23", call_type: "Actor Call", time: "6:00 PM", notes: "Runs begin at 6:45 PM"}
-			- {day: "Tuesday, Feb 24", call_type: "Actor Call", time: "6:45 PM", notes: "Open stage 6:30-7:00 PM"}
-			- {day: "Wednesday, Feb 25", call_type: "Actor Call", time: "6:45 PM", notes: "Invited tech with professors"}
-			- {day: "Thursday, Feb 26", call_type: "Actor Call", time: "6:45 PM", notes: "Recorded for research project"}
-			- {day: "Friday, Feb 27", call_type: "Show Call", time: "6:30 PM", notes: "Show at 7:00 PM"}
-			- {day: "Saturday, Feb 28", call_type: "Show Call", time: "6:30 PM", notes: "Show at 7:00 PM"}
+  moose:
+    display_name: "Moose"
+    calls:
+      - {day: "Monday, Feb 23", call_type: "Actor Call", time: "6:00 PM", notes: "Runs begin at 6:45 PM"}
+      - {day: "Tuesday, Feb 24", call_type: "Actor Call", time: "6:45 PM", notes: "Open stage 6:30-7:00 PM"}
+      - {day: "Wednesday, Feb 25", call_type: "Actor Call", time: "6:45 PM", notes: "Invited tech with professors"}
+      - {day: "Thursday, Feb 26", call_type: "Actor Call", time: "6:45 PM", notes: "Recorded for research project"}
+      - {day: "Friday, Feb 27", call_type: "Show Call", time: "6:30 PM", notes: "Show at 7:00 PM"}
+      - {day: "Saturday, Feb 28", call_type: "Show Call", time: "6:30 PM", notes: "Show at 7:00 PM"}
+  luca:
+    display_name: "Luca"
+    calls:
+      - {day: "Monday, Feb 23", call_type: "Actor Call", time: "6:00 PM", notes: "Runs begin at 6:45 PM"}
+      - {day: "Tuesday, Feb 24", call_type: "Actor Call", time: "6:45 PM", notes: "Open stage 6:30-7:00 PM"}
+      - {day: "Wednesday, Feb 25", call_type: "Actor Call", time: "6:45 PM", notes: "Invited tech with professors"}
+      - {day: "Thursday, Feb 26", call_type: "Actor Call", time: "6:45 PM", notes: "Recorded for research project"}
+      - {day: "Friday, Feb 27", call_type: "Show Call", time: "6:30 PM", notes: "Show at 7:00 PM"}
+      - {day: "Saturday, Feb 28", call_type: "Show Call", time: "6:30 PM", notes: "Show at 7:00 PM"}
 
 week_timeline:
-	- day: "Monday, Feb 23"
-		entries:
-			- {time: "5:30 PM", event: "Tech Call", notes: "SM/Crew prep"}
-			- {time: "6:00 PM", event: "Actors Call", notes: ""}
-			- {time: "6:45 PM", event: "Runs Start", notes: "Muppet/Shirt/Robot combinations"}
-			- {time: "8:00 PM", event: "Break", notes: "10 minutes (midway break)"}
-			- {time: "9:30 PM", event: "Q2Q", notes: "Begins at 9:30 PM"}
-			- {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
-	- day: "Tuesday, Feb 24"
-		entries:
-			- {time: "6:15 PM", event: "Tech Call", notes: ""}
-			- {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
-			- {time: "6:45 PM", event: "Actors Call", notes: ""}
-			- {time: "7:00 PM", event: "Full Run", notes: "Run of 12 following show order"}
-			- {time: "8:30 PM", event: "Break", notes: "10 minutes after run"}
-			- {time: "8:40 PM", event: "Work Pieces", notes: "Continue work until hard out"}
-			- {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
-	- day: "Wednesday, Feb 25"
-		entries:
-			- {time: "6:15 PM", event: "Tech Call", notes: "Invited tech"}
-			- {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
-			- {time: "6:45 PM", event: "Actors Call", notes: "Professors will be watching"}
-			- {time: "7:00 PM", event: "Full Run", notes: "Run of 12 following show order"}
-			- {time: "8:30 PM", event: "Break", notes: "10 minutes after run"}
-			- {time: "8:40 PM", event: "Work Pieces", notes: "Continue work until hard out"}
-			- {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
-	- day: "Thursday, Feb 26"
-		entries:
-			- {time: "6:15 PM", event: "Tech Call", notes: "Recorded for research project"}
-			- {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
-			- {time: "6:45 PM", event: "Actors Call", notes: ""}
-			- {time: "7:00 PM", event: "Full Run", notes: "Run of 12 following show order"}
-			- {time: "8:30 PM", event: "Break", notes: "10 minutes after run"}
-			- {time: "8:40 PM", event: "Work Pieces", notes: "Continue work until hard out"}
-			- {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
-	- day: "Friday, Feb 27"
-		entries:
-			- {time: "6:00 PM", event: "SM/Crew Call", notes: ""}
-			- {time: "6:30 PM", event: "Actors Call", notes: ""}
-			- {time: "7:00 PM", event: "Show Time", notes: ""}
-	- day: "Saturday, Feb 28"
-		entries:
-			- {time: "6:00 PM", event: "SM/Crew Call", notes: ""}
-			- {time: "6:30 PM", event: "Actors Call", notes: ""}
-			- {time: "7:00 PM", event: "Show Time", notes: ""}
+  - day: "Monday, Feb 23"
+    entries:
+      - {time: "5:30 PM", event: "Tech Call", notes: "SM/Crew prep"}
+      - {time: "6:00 PM", event: "Actors Call", notes: ""}
+      - {time: "6:45 PM", event: "Runs Start", notes: "Muppet/Shirt/Robot combinations"}
+      - {time: "8:00 PM", event: "Break", notes: "10 minutes (midway break)"}
+      - {time: "9:30 PM", event: "Q2Q", notes: "Begins at 9:30 PM"}
+      - {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
+  - day: "Tuesday, Feb 24"
+    entries:
+      - {time: "6:15 PM", event: "Tech Call", notes: ""}
+      - {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
+      - {time: "6:45 PM", event: "Actors Call", notes: ""}
+      - {time: "7:00 PM", event: "Full Run", notes: "Run of 12 following show order"}
+      - {time: "8:30 PM", event: "Break", notes: "10 minutes after run"}
+      - {time: "8:40 PM", event: "Work Pieces", notes: "Continue work until hard out"}
+      - {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
+  - day: "Wednesday, Feb 25"
+    entries:
+      - {time: "6:15 PM", event: "Tech Call", notes: "Invited tech"}
+      - {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
+      - {time: "6:45 PM", event: "Actors Call", notes: "Professors will be watching"}
+      - {time: "7:00 PM", event: "Full Run", notes: "Run of 12 following show order"}
+      - {time: "8:30 PM", event: "Break", notes: "10 minutes after run"}
+      - {time: "8:40 PM", event: "Work Pieces", notes: "Continue work until hard out"}
+      - {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
+  - day: "Thursday, Feb 26"
+    entries:
+      - {time: "6:15 PM", event: "Tech Call", notes: "Recorded for research project"}
+      - {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
+      - {time: "6:45 PM", event: "Actors Call", notes: ""}
+      - {time: "7:00 PM", event: "Full Run", notes: "Run of 12 following show order"}
+      - {time: "8:30 PM", event: "Break", notes: "10 minutes after run"}
+      - {time: "8:40 PM", event: "Work Pieces", notes: "Continue work until hard out"}
+      - {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
+  - day: "Friday, Feb 27"
+    entries:
+      - {time: "6:00 PM", event: "SM/Crew Call", notes: ""}
+      - {time: "6:30 PM", event: "Actors Call", notes: ""}
+      - {time: "7:00 PM", event: "Show Time", notes: ""}
+  - day: "Saturday, Feb 28"
+    entries:
+      - {time: "6:00 PM", event: "SM/Crew Call", notes: ""}
+      - {time: "6:30 PM", event: "Actors Call", notes: ""}
+      - {time: "7:00 PM", event: "Show Time", notes: ""}

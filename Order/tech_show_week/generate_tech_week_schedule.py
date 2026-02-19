@@ -50,7 +50,6 @@ def load_base_run_order_rows(path: str) -> list[dict]:
 						"DominPerformer": "",
 						"Alquist": "",
 						"AlquistPerformer": "",
-						"Notes": "Intermission",
 					}
 				)
 				continue
@@ -63,7 +62,6 @@ def load_base_run_order_rows(path: str) -> list[dict]:
 					"DominPerformer": (row.get("DominPerformer") or "").strip(),
 					"Alquist": (row.get("Alquist") or "").strip(),
 					"AlquistPerformer": (row.get("AlquistPerformer") or "").strip(),
-					"Notes": "Order 12 from base schedule generator",
 				}
 			)
 	return rows
@@ -84,12 +82,16 @@ def build_performer_call_rows(config: dict, performer_key: str) -> list[dict]:
 	return rows
 
 
-def build_week_timeline_by_day(config: dict) -> dict[str, list[dict]]:
+def build_week_timeline_by_day(config: dict) -> tuple[dict[str, list[dict]], dict[str, list[dict]]]:
 	by_day: dict[str, list[dict]] = {key: [] for key in DAY_KEYS}
+	notes_by_day: dict[str, list[dict]] = {key: [] for key in DAY_KEYS}
+
 	for day in config.get("week_timeline", []):
 		day_label = day["day"]
 		day_key = day_label.split(",")[0].strip().lower()
 		rows = by_day.setdefault(day_key, [])
+		day_notes = notes_by_day.setdefault(day_key, [])
+
 		for entry in day.get("entries", []):
 			rows.append(
 				{
@@ -98,7 +100,17 @@ def build_week_timeline_by_day(config: dict) -> dict[str, list[dict]]:
 					"Notes": entry.get("notes", ""),
 				}
 			)
-	return by_day
+			note_text = (entry.get("notes") or "").strip()
+			if note_text:
+				day_notes.append({"Note": note_text})
+
+		custom_notes = day.get("day_notes", [])
+		for note in custom_notes:
+			text = str(note).strip()
+			if text:
+				day_notes.append({"Note": text})
+
+	return by_day, notes_by_day
 
 
 def build_monday_explicit_runs(config: dict) -> list[dict]:
@@ -115,17 +127,44 @@ def build_monday_explicit_runs(config: dict) -> list[dict]:
 				"DominPerformer": "",
 				"Alquist": item.get("scene_b", ""),
 				"AlquistPerformer": "",
-				"Notes": item.get("notes", "Monday explicit run order"),
 			}
 		)
 	return rows
 
 
-def build_general_show_order_rows(monday_rows: list[dict], order12_rows: list[dict]) -> list[dict]:
-	summary_rows: list[dict] = []
-	summary_rows.extend(monday_rows)
-	summary_rows.extend(order12_rows)
-	return summary_rows
+def build_day_combined_rows(
+	timeline_rows: list[dict],
+	run_rows: list[dict],
+) -> list[dict]:
+	combined: list[dict] = []
+
+	for row in timeline_rows:
+		combined.append(
+			{
+				"Time": row.get("Time", ""),
+				"Type": "Schedule",
+				"Event": row.get("Event", ""),
+				"Domin": "",
+				"DominPerformer": "",
+				"Alquist": "",
+				"AlquistPerformer": "",
+			}
+		)
+
+	for row in run_rows:
+		combined.append(
+			{
+				"Time": row.get("Time", ""),
+				"Type": "Run",
+				"Event": row.get("Run", ""),
+				"Domin": row.get("Domin", ""),
+				"DominPerformer": row.get("DominPerformer", ""),
+				"Alquist": row.get("Alquist", ""),
+				"AlquistPerformer": row.get("AlquistPerformer", ""),
+			}
+		)
+
+	return combined
 
 
 def build_day_run_orders(config: dict, order12_rows: list[dict]) -> dict[str, list[dict]]:
@@ -143,7 +182,6 @@ def build_day_run_orders(config: dict, order12_rows: list[dict]) -> dict[str, li
 				"DominPerformer": "",
 				"Alquist": "",
 				"AlquistPerformer": "",
-				"Notes": "Show day",
 			}
 		],
 		"saturday": [
@@ -154,7 +192,6 @@ def build_day_run_orders(config: dict, order12_rows: list[dict]) -> dict[str, li
 				"DominPerformer": "",
 				"Alquist": "",
 				"AlquistPerformer": "",
-				"Notes": "Show day",
 			}
 		],
 	}
@@ -173,33 +210,49 @@ def main() -> None:
 	run_base_order_generator(order_dir)
 	order12_rows = load_base_run_order_rows(os.path.join(order_dir, "show_order.csv"))
 
-	timeline_by_day = build_week_timeline_by_day(config)
+	timeline_by_day, notes_by_day = build_week_timeline_by_day(config)
 	run_orders_by_day = build_day_run_orders(config, order12_rows)
 	moose_rows = build_performer_call_rows(config, "moose")
 	luca_rows = build_performer_call_rows(config, "luca")
 
-	run_headers = ["Run", "Time", "Domin", "DominPerformer", "Alquist", "AlquistPerformer", "Notes"]
+	run_headers = ["Run", "Time", "Domin", "DominPerformer", "Alquist", "AlquistPerformer"]
 	timeline_headers = ["Time", "Event", "Notes"]
+	combined_headers = [
+		"Time",
+		"Type",
+		"Event",
+		"Domin",
+		"DominPerformer",
+		"Alquist",
+		"AlquistPerformer",
+	]
+	day_note_headers = ["Note"]
 	call_headers = ["Day", "CallType", "Time", "Notes"]
-
-	monday_rows = run_orders_by_day["monday"]
-	write_csv(
-		os.path.join(base_dir, "general_show_order.csv"),
-		run_headers,
-		build_general_show_order_rows(monday_rows, order12_rows),
-	)
 
 	ensure_output_dir(days_dir)
 	for day_key in DAY_KEYS:
+		timeline_rows = timeline_by_day.get(day_key, [])
+		run_rows = run_orders_by_day.get(day_key, [])
+
 		write_csv(
 			os.path.join(days_dir, f"{day_key}_timeline.csv"),
 			timeline_headers,
-			timeline_by_day.get(day_key, []),
+			timeline_rows,
 		)
 		write_csv(
 			os.path.join(days_dir, f"{day_key}_runs.csv"),
 			run_headers,
-			run_orders_by_day.get(day_key, []),
+			run_rows,
+		)
+		write_csv(
+			os.path.join(days_dir, f"{day_key}_combined.csv"),
+			combined_headers,
+			build_day_combined_rows(timeline_rows, run_rows),
+		)
+		write_csv(
+			os.path.join(days_dir, f"{day_key}_notes.csv"),
+			day_note_headers,
+			notes_by_day.get(day_key, []),
 		)
 
 	ensure_output_dir(performers_dir)

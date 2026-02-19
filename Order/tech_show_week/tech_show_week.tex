@@ -1,356 +1,293 @@
 \documentclass{article}
 \usepackage{datatool}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=0.75in]{geometry}
 \usepackage{longtable}
+\usepackage{array}
 \usepackage{draftwatermark}
 \SetWatermarkText{DRAFT}
 \SetWatermarkScale{3}
 
-\DTLloaddb[
-  keys={Time,Event,Notes}
-]{mondaytimeline}{days/monday_timeline.csv}
-\DTLloaddb[
-  keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes}
-]{mondayruns}{days/monday_runs.csv}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\setlength{\tabcolsep}{2pt}
 
-\DTLloaddb[
-  keys={Time,Event,Notes}
-]{tuesdaytimeline}{days/tuesday_timeline.csv}
-\DTLloaddb[
-  keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes}
-]{tuesdayruns}{days/tuesday_runs.csv}
+\DTLloaddb[keys={Time,Type,Event,Domin,DominPerformer,Alquist,AlquistPerformer}]{mondaycombined}{days/monday_combined.csv}
+\DTLloaddb[keys={Time,Type,Event,Domin,DominPerformer,Alquist,AlquistPerformer}]{tuesdaycombined}{days/tuesday_combined.csv}
+\DTLloaddb[keys={Time,Type,Event,Domin,DominPerformer,Alquist,AlquistPerformer}]{wednesdaycombined}{days/wednesday_combined.csv}
+\DTLloaddb[keys={Time,Type,Event,Domin,DominPerformer,Alquist,AlquistPerformer}]{thursdaycombined}{days/thursday_combined.csv}
+\DTLloaddb[keys={Time,Type,Event,Domin,DominPerformer,Alquist,AlquistPerformer}]{fridaycombined}{days/friday_combined.csv}
+\DTLloaddb[keys={Time,Type,Event,Domin,DominPerformer,Alquist,AlquistPerformer}]{saturdaycombined}{days/saturday_combined.csv}
 
-\DTLloaddb[
-  keys={Time,Event,Notes}
-]{wednesdaytimeline}{days/wednesday_timeline.csv}
-\DTLloaddb[
-  keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes}
-]{wednesdayruns}{days/wednesday_runs.csv}
+\DTLloaddb[keys={Note}]{mondaynotes}{days/monday_notes.csv}
+\DTLloaddb[keys={Note}]{tuesdaynotes}{days/tuesday_notes.csv}
+\DTLloaddb[keys={Note}]{wednesdaynotes}{days/wednesday_notes.csv}
+\DTLloaddb[keys={Note}]{thursdaynotes}{days/thursday_notes.csv}
+\DTLloaddb[keys={Note}]{fridaynotes}{days/friday_notes.csv}
+\DTLloaddb[keys={Note}]{saturdaynotes}{days/saturday_notes.csv}
 
-\DTLloaddb[
-  keys={Time,Event,Notes}
-]{thursdaytimeline}{days/thursday_timeline.csv}
-\DTLloaddb[
-  keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes}
-]{thursdayruns}{days/thursday_runs.csv}
+\DTLloaddb[keys={Day,CallType,Time,Notes}]{moosecalls}{performers/moose.csv}
+\DTLloaddb[keys={Day,CallType,Time,Notes}]{lucacalls}{performers/luca.csv}
 
-\DTLloaddb[
-  keys={Time,Event,Notes}
-]{fridaytimeline}{days/friday_timeline.csv}
-\DTLloaddb[
-  keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes}
-]{fridayruns}{days/friday_runs.csv}
-
-\DTLloaddb[
-  keys={Time,Event,Notes}
-]{saturdaytimeline}{days/saturday_timeline.csv}
-\DTLloaddb[
-  keys={Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes}
-]{saturdayruns}{days/saturday_runs.csv}
-
-\DTLloaddb[
-  keys={Day,CallType,Time,Notes}
-]{moosecalls}{performers/moose.csv}
-
-\DTLloaddb[
-  keys={Day,CallType,Time,Notes}
-]{lucacalls}{performers/luca.csv}
+\DTLloaddb[keys={Run,RunStart,Character,CharacterInTime,CharacterOutTime}]{mooseperf}{../performers/moose.csv}
+\DTLloaddb[keys={Run,RunStart,Character,CharacterInTime,CharacterOutTime}]{lucaperf}{../performers/luca.csv}
 
 \begin{document}
 
 \section*{Object Performance}
 Tech/Show Week Schedule (February 23-28, 2026)
 
-\bigskip
-
+\newpage
 \subsection*{Monday, Feb 23}
-\textbf{Day Schedule}
-\begin{longtable}{|l|l|p{3.8in}|}
+\footnotesize
+\textbf{Combined Day Schedule + Run Order}
+\begin{longtable}{|p{0.75in}|p{0.65in}|p{1.35in}|p{0.85in}|p{0.75in}|p{0.85in}|p{0.75in}|}
 \hline
-\textbf{Time} & \textbf{Event} & \textbf{Notes} \\
+\textbf{Time} & \textbf{Type} & \textbf{Event} & \textbf{Domin} & \textbf{Perf} & \textbf{Alquist} & \textbf{Perf} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{mondaytimeline}{
-  \Time=Time,
-  \Event=Event,
-  \Notes=Notes
-}{%
-  \Time & \Event & \Notes \\
-  \hline
+\DTLforeach{mondaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
+\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\hline
 }
 \end{longtable}
 
-\textbf{Run Order}
-\begin{longtable}{|l|l|l|l|l|l|p{1.7in}|}
+\normalsize
+\textbf{Day Notes}
+\begin{longtable}{|p{6.2in}|}
 \hline
-\textbf{Run} & \textbf{Time} & \textbf{Domin} & \textbf{Performer} & \textbf{Alquist} & \textbf{Performer} & \textbf{Notes} \\
+\textbf{Note} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{mondayruns}{
-  \Run=Run,
-  \Time=Time,
-  \Domin=Domin,
-  \DominPerformer=DominPerformer,
-  \Alquist=Alquist,
-  \AlquistPerformer=AlquistPerformer,
-  \Notes=Notes
-}{%
-  \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer & \Notes \\
-  \hline
+\DTLforeach{mondaynotes}{\Note=Note}{%
+\Note \\
+\hline
 }
 \end{longtable}
 
 \newpage
 \subsection*{Tuesday, Feb 24}
-\textbf{Day Schedule}
-\begin{longtable}{|l|l|p{3.8in}|}
+\footnotesize
+\textbf{Combined Day Schedule + Run Order}
+\begin{longtable}{|p{0.75in}|p{0.65in}|p{1.35in}|p{0.85in}|p{0.75in}|p{0.85in}|p{0.75in}|}
 \hline
-\textbf{Time} & \textbf{Event} & \textbf{Notes} \\
+\textbf{Time} & \textbf{Type} & \textbf{Event} & \textbf{Domin} & \textbf{Perf} & \textbf{Alquist} & \textbf{Perf} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{tuesdaytimeline}{
-  \Time=Time,
-  \Event=Event,
-  \Notes=Notes
-}{%
-  \Time & \Event & \Notes \\
-  \hline
+\DTLforeach{tuesdaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
+\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\hline
 }
 \end{longtable}
 
-\textbf{Run Order (Order 12)}
-\begin{longtable}{|l|l|l|l|l|l|p{1.7in}|}
+\normalsize
+\textbf{Day Notes}
+\begin{longtable}{|p{6.2in}|}
 \hline
-\textbf{Run} & \textbf{Time} & \textbf{Domin} & \textbf{Performer} & \textbf{Alquist} & \textbf{Performer} & \textbf{Notes} \\
+\textbf{Note} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{tuesdayruns}{
-  \Run=Run,
-  \Time=Time,
-  \Domin=Domin,
-  \DominPerformer=DominPerformer,
-  \Alquist=Alquist,
-  \AlquistPerformer=AlquistPerformer,
-  \Notes=Notes
-}{%
-  \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer & \Notes \\
-  \hline
+\DTLforeach{tuesdaynotes}{\Note=Note}{%
+\Note \\
+\hline
 }
 \end{longtable}
 
 \newpage
 \subsection*{Wednesday, Feb 25}
-\textbf{Day Schedule}
-\begin{longtable}{|l|l|p{3.8in}|}
+\footnotesize
+\textbf{Combined Day Schedule + Run Order}
+\begin{longtable}{|p{0.75in}|p{0.65in}|p{1.35in}|p{0.85in}|p{0.75in}|p{0.85in}|p{0.75in}|}
 \hline
-\textbf{Time} & \textbf{Event} & \textbf{Notes} \\
+\textbf{Time} & \textbf{Type} & \textbf{Event} & \textbf{Domin} & \textbf{Perf} & \textbf{Alquist} & \textbf{Perf} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{wednesdaytimeline}{
-  \Time=Time,
-  \Event=Event,
-  \Notes=Notes
-}{%
-  \Time & \Event & \Notes \\
-  \hline
+\DTLforeach{wednesdaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
+\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\hline
 }
 \end{longtable}
 
-\textbf{Run Order (Order 12)}
-\begin{longtable}{|l|l|l|l|l|l|p{1.7in}|}
+\normalsize
+\textbf{Day Notes}
+\begin{longtable}{|p{6.2in}|}
 \hline
-\textbf{Run} & \textbf{Time} & \textbf{Domin} & \textbf{Performer} & \textbf{Alquist} & \textbf{Performer} & \textbf{Notes} \\
+\textbf{Note} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{wednesdayruns}{
-  \Run=Run,
-  \Time=Time,
-  \Domin=Domin,
-  \DominPerformer=DominPerformer,
-  \Alquist=Alquist,
-  \AlquistPerformer=AlquistPerformer,
-  \Notes=Notes
-}{%
-  \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer & \Notes \\
-  \hline
+\DTLforeach{wednesdaynotes}{\Note=Note}{%
+\Note \\
+\hline
 }
 \end{longtable}
 
 \newpage
 \subsection*{Thursday, Feb 26}
-\textbf{Day Schedule}
-\begin{longtable}{|l|l|p{3.8in}|}
+\footnotesize
+\textbf{Combined Day Schedule + Run Order}
+\begin{longtable}{|p{0.75in}|p{0.65in}|p{1.35in}|p{0.85in}|p{0.75in}|p{0.85in}|p{0.75in}|}
 \hline
-\textbf{Time} & \textbf{Event} & \textbf{Notes} \\
+\textbf{Time} & \textbf{Type} & \textbf{Event} & \textbf{Domin} & \textbf{Perf} & \textbf{Alquist} & \textbf{Perf} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{thursdaytimeline}{
-  \Time=Time,
-  \Event=Event,
-  \Notes=Notes
-}{%
-  \Time & \Event & \Notes \\
-  \hline
+\DTLforeach{thursdaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
+\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\hline
 }
 \end{longtable}
 
-\textbf{Run Order (Order 12)}
-\begin{longtable}{|l|l|l|l|l|l|p{1.7in}|}
+\normalsize
+\textbf{Day Notes}
+\begin{longtable}{|p{6.2in}|}
 \hline
-\textbf{Run} & \textbf{Time} & \textbf{Domin} & \textbf{Performer} & \textbf{Alquist} & \textbf{Performer} & \textbf{Notes} \\
+\textbf{Note} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{thursdayruns}{
-  \Run=Run,
-  \Time=Time,
-  \Domin=Domin,
-  \DominPerformer=DominPerformer,
-  \Alquist=Alquist,
-  \AlquistPerformer=AlquistPerformer,
-  \Notes=Notes
-}{%
-  \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer & \Notes \\
-  \hline
+\DTLforeach{thursdaynotes}{\Note=Note}{%
+\Note \\
+\hline
 }
 \end{longtable}
 
 \newpage
 \subsection*{Friday, Feb 27}
-\textbf{Day Schedule}
-\begin{longtable}{|l|l|p{3.8in}|}
+\footnotesize
+\textbf{Combined Day Schedule + Run Order}
+\begin{longtable}{|p{0.75in}|p{0.65in}|p{1.35in}|p{0.85in}|p{0.75in}|p{0.85in}|p{0.75in}|}
 \hline
-\textbf{Time} & \textbf{Event} & \textbf{Notes} \\
+\textbf{Time} & \textbf{Type} & \textbf{Event} & \textbf{Domin} & \textbf{Perf} & \textbf{Alquist} & \textbf{Perf} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{fridaytimeline}{
-  \Time=Time,
-  \Event=Event,
-  \Notes=Notes
-}{%
-  \Time & \Event & \Notes \\
-  \hline
+\DTLforeach{fridaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
+\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\hline
 }
 \end{longtable}
 
-\textbf{Run Order}
-\begin{longtable}{|l|l|l|l|l|l|p{1.7in}|}
+\normalsize
+\textbf{Day Notes}
+\begin{longtable}{|p{6.2in}|}
 \hline
-\textbf{Run} & \textbf{Time} & \textbf{Domin} & \textbf{Performer} & \textbf{Alquist} & \textbf{Performer} & \textbf{Notes} \\
+\textbf{Note} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{fridayruns}{
-  \Run=Run,
-  \Time=Time,
-  \Domin=Domin,
-  \DominPerformer=DominPerformer,
-  \Alquist=Alquist,
-  \AlquistPerformer=AlquistPerformer,
-  \Notes=Notes
-}{%
-  \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer & \Notes \\
-  \hline
+\DTLforeach{fridaynotes}{\Note=Note}{%
+\Note \\
+\hline
 }
 \end{longtable}
 
 \newpage
 \subsection*{Saturday, Feb 28}
-\textbf{Day Schedule}
-\begin{longtable}{|l|l|p{3.8in}|}
+\footnotesize
+\textbf{Combined Day Schedule + Run Order}
+\begin{longtable}{|p{0.75in}|p{0.65in}|p{1.35in}|p{0.85in}|p{0.75in}|p{0.85in}|p{0.75in}|}
 \hline
-\textbf{Time} & \textbf{Event} & \textbf{Notes} \\
+\textbf{Time} & \textbf{Type} & \textbf{Event} & \textbf{Domin} & \textbf{Perf} & \textbf{Alquist} & \textbf{Perf} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{saturdaytimeline}{
-  \Time=Time,
-  \Event=Event,
-  \Notes=Notes
-}{%
-  \Time & \Event & \Notes \\
-  \hline
+\DTLforeach{saturdaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
+\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\hline
 }
 \end{longtable}
 
-\textbf{Run Order}
-\begin{longtable}{|l|l|l|l|l|l|p{1.7in}|}
+\normalsize
+\textbf{Day Notes}
+\begin{longtable}{|p{6.2in}|}
 \hline
-\textbf{Run} & \textbf{Time} & \textbf{Domin} & \textbf{Performer} & \textbf{Alquist} & \textbf{Performer} & \textbf{Notes} \\
+\textbf{Note} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{saturdayruns}{
-  \Run=Run,
-  \Time=Time,
-  \Domin=Domin,
-  \DominPerformer=DominPerformer,
-  \Alquist=Alquist,
-  \AlquistPerformer=AlquistPerformer,
-  \Notes=Notes
-}{%
-  \Run & \Time & \Domin & \DominPerformer & \Alquist & \AlquistPerformer & \Notes \\
-  \hline
+\DTLforeach{saturdaynotes}{\Note=Note}{%
+\Note \\
+\hline
 }
 \end{longtable}
 
 \newpage
 \subsection*{Moose Times and Calls}
-\begin{longtable}{|l|l|l|p{2.8in}|}
+\begin{longtable}{|p{1.35in}|p{1.1in}|p{0.9in}|p{2.6in}|}
 \hline
 \textbf{Day} & \textbf{Call Type} & \textbf{Time} & \textbf{Notes} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{moosecalls}{
-  \Day=Day,
-  \CallType=CallType,
-  \Time=Time,
-  \Notes=Notes
-}{%
-  \Day & \CallType & \Time & \Notes \\
-  \hline
+\DTLforeach{moosecalls}{\Day=Day,\CallType=CallType,\Time=Time,\Notes=Notes}{%
+\Day & \CallType & \Time & \Notes \\
+\hline
 }
 \end{longtable}
 
+\textbf{Moose Performance Schedule}
+\footnotesize
+\begin{longtable}{|p{0.65in}|p{0.85in}|p{0.95in}|p{0.95in}|p{0.95in}|}
+\hline
+\textbf{Run} & \textbf{Run Start} & \textbf{Character} & \textbf{In Time} & \textbf{Out Time} \\
+\hline
+\endhead
+\hline
+\endfoot
+\DTLforeach{mooseperf}{\Run=Run,\RunStart=RunStart,\Character=Character,\InTime=CharacterInTime,\OutTime=CharacterOutTime}{%
+\Run & \RunStart & \Character & \InTime & \OutTime \\
+\hline
+}
+\end{longtable}
+\normalsize
+
+\newpage
 \subsection*{Luca Times and Calls}
-\begin{longtable}{|l|l|l|p{2.8in}|}
+\begin{longtable}{|p{1.35in}|p{1.1in}|p{0.9in}|p{2.6in}|}
 \hline
 \textbf{Day} & \textbf{Call Type} & \textbf{Time} & \textbf{Notes} \\
 \hline
 \endhead
 \hline
 \endfoot
-\DTLforeach{lucacalls}{
-  \Day=Day,
-  \CallType=CallType,
-  \Time=Time,
-  \Notes=Notes
-}{%
-  \Day & \CallType & \Time & \Notes \\
-  \hline
+\DTLforeach{lucacalls}{\Day=Day,\CallType=CallType,\Time=Time,\Notes=Notes}{%
+\Day & \CallType & \Time & \Notes \\
+\hline
 }
 \end{longtable}
+
+\textbf{Luca Performance Schedule}
+\footnotesize
+\begin{longtable}{|p{0.65in}|p{0.85in}|p{0.95in}|p{0.95in}|p{0.95in}|}
+\hline
+\textbf{Run} & \textbf{Run Start} & \textbf{Character} & \textbf{In Time} & \textbf{Out Time} \\
+\hline
+\endhead
+\hline
+\endfoot
+\DTLforeach{lucaperf}{\Run=Run,\RunStart=RunStart,\Character=Character,\InTime=CharacterInTime,\OutTime=CharacterOutTime}{%
+\Run & \RunStart & \Character & \InTime & \OutTime \\
+\hline
+}
+\end{longtable}
+\normalsize
 
 \end{document}

@@ -3,19 +3,19 @@ Time,Type,Event,Domin,DominPerformer,Alquist,AlquistPerformer
 6:30 PM,Schedule,Open Stage,,,,
 6:45 PM,Schedule,Actors Call,,,,
 7:00 PM,Schedule,Full Run,,,,
-8:30 PM,Schedule,Break,,,,
-8:40 PM,Schedule,Work Pieces,,,,
-11:00 PM,Schedule,Hard Out,,,,
-7:00 PM,Run,1,Muppet,Moose,Shirt,Luca
-7:14 PM,Run,2,Shirt,Luca,Animatronic,None
-7:28 PM,Run,3,Animatronic,None,Muppet,Moose
-7:42 PM,Run,4,Robot,Moose,Animatronic,None
-7:56 PM,Run,5,Shirt,Moose,Muppet,Luca
-8:10 PM,Run,6,Animatronic,None,Robot,Moose
+7:00 PM,Run,1,Shirt,Moose,Robot,Luca
+7:14 PM,Run,2,Animatronic,None,Muppet,Moose
+7:28 PM,Run,3,Robot,Luca,Shirt,Moose
+7:42 PM,Run,4,Muppet,Moose,Robot,Luca
+7:56 PM,Run,5,Robot,Luca,Animatronic,None
+8:10 PM,Run,6,Animatronic,None,Shirt,Luca
 8:24 PM,Run,Intermission,,,,
-8:34 PM,Run,7,Muppet,Luca,Animatronic,None
-8:48 PM,Run,8,Robot,Luca,Shirt,Moose
-9:02 PM,Run,9,Muppet,Moose,Robot,Luca
-9:16 PM,Run,10,Animatronic,None,Shirt,Luca
-9:30 PM,Run,11,Shirt,Luca,Robot,Moose
+8:30 PM,Schedule,Break,,,,
+8:34 PM,Run,7,Muppet,Moose,Animatronic,None
+8:40 PM,Schedule,Work Pieces,,,,
+8:48 PM,Run,8,Shirt,Luca,Muppet,Moose
+9:02 PM,Run,9,Animatronic,None,Robot,Moose
+9:16 PM,Run,10,Muppet,Moose,Shirt,Luca
+9:30 PM,Run,11,Shirt,Luca,Animatronic,None
 9:44 PM,Run,12,Robot,Moose,Muppet,Luca
+11:00 PM,Schedule,Hard Out,,,,

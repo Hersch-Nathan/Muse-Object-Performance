@@ -1,2 +1,14 @@
 Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer
-Show,7:00 PM,Performance,,,
+1,7:00 PM,Shirt,Moose,Robot,Luca
+2,7:14 PM,Animatronic,None,Muppet,Moose
+3,7:28 PM,Robot,Luca,Shirt,Moose
+4,7:42 PM,Muppet,Moose,Robot,Luca
+5,7:56 PM,Robot,Luca,Animatronic,None
+6,8:10 PM,Animatronic,None,Shirt,Luca
+Intermission,8:24 PM,,,,
+7,8:34 PM,Muppet,Moose,Animatronic,None
+8,8:48 PM,Shirt,Luca,Muppet,Moose
+9,9:02 PM,Animatronic,None,Robot,Moose
+10,9:16 PM,Muppet,Moose,Shirt,Luca
+11,9:30 PM,Shirt,Luca,Animatronic,None
+12,9:44 PM,Robot,Moose,Muppet,Luca

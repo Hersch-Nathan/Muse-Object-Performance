@@ -3,6 +3,8 @@
 \usepackage[margin=0.75in]{geometry}
 \usepackage{longtable}
 \usepackage{array}
+\usepackage[table]{xcolor}
+\usepackage{ifthen}
 \usepackage{draftwatermark}
 \SetWatermarkText{DRAFT}
 \SetWatermarkScale{3}
@@ -34,10 +36,17 @@
 
 \begin{document}
 
-\section*{Object Performance}
-Tech/Show Week Schedule (February 23-28, 2026)
+\begin{titlepage}
+\centering
+\vspace*{0.3\textheight}
+{\LARGE Object Performance \par}
+\vspace{0.75em}
+{\Large Tech/Show Week Schedule \par}
+\vspace{0.5em}
+{\large February 23--28, 2026 \par}
+\vfill
+\end{titlepage}
 
-\newpage
 \subsection*{Monday, Feb 23}
 \footnotesize
 \textbf{Combined Day Schedule + Run Order}
@@ -49,25 +58,14 @@ Tech/Show Week Schedule (February 23-28, 2026)
 \hline
 \endfoot
 \DTLforeach{mondaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
-\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\Time & \Type & \ifthenelse{\equal{\Type}{Schedule}\and\equal{\Event}{Full Run}}{\colorbox{yellow!25}{\Event}}{\Event} & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
 \hline
 }
 \end{longtable}
 
 \normalsize
 \textbf{Day Notes}
-\begin{longtable}{|p{6.2in}|}
-\hline
-\textbf{Note} \\
-\hline
-\endhead
-\hline
-\endfoot
-\DTLforeach{mondaynotes}{\Note=Note}{%
-\Note \\
-\hline
-}
-\end{longtable}
+\DTLforeach{mondaynotes}{\Note=Note}{\Note\par}
 
 \newpage
 \subsection*{Tuesday, Feb 24}
@@ -81,25 +79,14 @@ Tech/Show Week Schedule (February 23-28, 2026)
 \hline
 \endfoot
 \DTLforeach{tuesdaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
-\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\Time & \Type & \ifthenelse{\equal{\Type}{Schedule}\and\equal{\Event}{Full Run}}{\colorbox{yellow!25}{\Event}}{\Event} & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
 \hline
 }
 \end{longtable}
 
 \normalsize
 \textbf{Day Notes}
-\begin{longtable}{|p{6.2in}|}
-\hline
-\textbf{Note} \\
-\hline
-\endhead
-\hline
-\endfoot
-\DTLforeach{tuesdaynotes}{\Note=Note}{%
-\Note \\
-\hline
-}
-\end{longtable}
+\DTLforeach{tuesdaynotes}{\Note=Note}{\Note\par}
 
 \newpage
 \subsection*{Wednesday, Feb 25}
@@ -113,25 +100,14 @@ Tech/Show Week Schedule (February 23-28, 2026)
 \hline
 \endfoot
 \DTLforeach{wednesdaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
-\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\Time & \Type & \ifthenelse{\equal{\Type}{Schedule}\and\equal{\Event}{Full Run}}{\colorbox{yellow!25}{\Event}}{\Event} & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
 \hline
 }
 \end{longtable}
 
 \normalsize
 \textbf{Day Notes}
-\begin{longtable}{|p{6.2in}|}
-\hline
-\textbf{Note} \\
-\hline
-\endhead
-\hline
-\endfoot
-\DTLforeach{wednesdaynotes}{\Note=Note}{%
-\Note \\
-\hline
-}
-\end{longtable}
+\DTLforeach{wednesdaynotes}{\Note=Note}{\Note\par}
 
 \newpage
 \subsection*{Thursday, Feb 26}
@@ -145,25 +121,14 @@ Tech/Show Week Schedule (February 23-28, 2026)
 \hline
 \endfoot
 \DTLforeach{thursdaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
-\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\Time & \Type & \ifthenelse{\equal{\Type}{Schedule}\and\equal{\Event}{Full Run}}{\colorbox{yellow!25}{\Event}}{\Event} & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
 \hline
 }
 \end{longtable}
 
 \normalsize
 \textbf{Day Notes}
-\begin{longtable}{|p{6.2in}|}
-\hline
-\textbf{Note} \\
-\hline
-\endhead
-\hline
-\endfoot
-\DTLforeach{thursdaynotes}{\Note=Note}{%
-\Note \\
-\hline
-}
-\end{longtable}
+\DTLforeach{thursdaynotes}{\Note=Note}{\Note\par}
 
 \newpage
 \subsection*{Friday, Feb 27}
@@ -177,25 +142,14 @@ Tech/Show Week Schedule (February 23-28, 2026)
 \hline
 \endfoot
 \DTLforeach{fridaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
-\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\Time & \Type & \ifthenelse{\equal{\Type}{Schedule}\and\equal{\Event}{Full Run}}{\colorbox{yellow!25}{\Event}}{\Event} & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
 \hline
 }
 \end{longtable}
 
 \normalsize
 \textbf{Day Notes}
-\begin{longtable}{|p{6.2in}|}
-\hline
-\textbf{Note} \\
-\hline
-\endhead
-\hline
-\endfoot
-\DTLforeach{fridaynotes}{\Note=Note}{%
-\Note \\
-\hline
-}
-\end{longtable}
+\DTLforeach{fridaynotes}{\Note=Note}{\Note\par}
 
 \newpage
 \subsection*{Saturday, Feb 28}
@@ -209,25 +163,14 @@ Tech/Show Week Schedule (February 23-28, 2026)
 \hline
 \endfoot
 \DTLforeach{saturdaycombined}{\Time=Time,\Type=Type,\Event=Event,\Domin=Domin,\DominPerformer=DominPerformer,\Alquist=Alquist,\AlquistPerformer=AlquistPerformer}{%
-\Time & \Type & \Event & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
+\Time & \Type & \ifthenelse{\equal{\Type}{Schedule}\and\equal{\Event}{Full Run}}{\colorbox{yellow!25}{\Event}}{\Event} & \Domin & \DominPerformer & \Alquist & \AlquistPerformer \\
 \hline
 }
 \end{longtable}
 
 \normalsize
 \textbf{Day Notes}
-\begin{longtable}{|p{6.2in}|}
-\hline
-\textbf{Note} \\
-\hline
-\endhead
-\hline
-\endfoot
-\DTLforeach{saturdaynotes}{\Note=Note}{%
-\Note \\
-\hline
-}
-\end{longtable}
+\DTLforeach{saturdaynotes}{\Note=Note}{\Note\par}
 
 \newpage
 \subsection*{Moose Times and Calls}

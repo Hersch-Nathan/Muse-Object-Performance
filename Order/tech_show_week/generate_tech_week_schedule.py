@@ -2,6 +2,7 @@ import csv
 import os
 import subprocess
 import sys
+from datetime import datetime, timedelta
 
 try:
 	import yaml
@@ -12,6 +13,18 @@ except ImportError as exc:  # pragma: no cover - runtime dependency message
 
 
 DAY_KEYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+
+
+def parse_clock_minutes(value: str) -> int:
+	text = (value or "").strip()
+	if not text:
+		return 10_000
+	parsed = datetime.strptime(text, "%I:%M %p")
+	return parsed.hour * 60 + parsed.minute
+
+
+def format_clock(value: datetime) -> str:
+	return value.strftime("%I:%M %p").lstrip("0")
 
 
 def load_config(path: str) -> dict:
@@ -100,11 +113,11 @@ def build_week_timeline_by_day(config: dict) -> tuple[dict[str, list[dict]], dic
 					"Notes": entry.get("notes", ""),
 				}
 			)
-			note_text = (entry.get("notes") or "").strip()
-			if note_text:
-				day_notes.append({"Note": note_text})
 
 		custom_notes = day.get("day_notes", [])
+		if isinstance(custom_notes, str):
+			custom_notes = [custom_notes]
+
 		for note in custom_notes:
 			text = str(note).strip()
 			if text:
@@ -115,6 +128,9 @@ def build_week_timeline_by_day(config: dict) -> tuple[dict[str, list[dict]], dic
 
 def build_monday_explicit_runs(config: dict) -> list[dict]:
 	rows: list[dict] = []
+	run_time = datetime.strptime("6:45 PM", "%I:%M %p")
+	run_step = timedelta(minutes=14)
+
 	for item in config.get("show_order", []):
 		run_label = str(item.get("run_label", "")).strip()
 		if run_label not in {"Run 1", "Run 2", "Run 3", "Run 4"}:
@@ -122,13 +138,14 @@ def build_monday_explicit_runs(config: dict) -> list[dict]:
 		rows.append(
 			{
 				"Run": run_label,
-				"Time": "",
+				"Time": format_clock(run_time),
 				"Domin": item.get("scene_a", ""),
 				"DominPerformer": "",
 				"Alquist": item.get("scene_b", ""),
 				"AlquistPerformer": "",
 			}
 		)
+		run_time += run_step
 	return rows
 
 
@@ -164,6 +181,14 @@ def build_day_combined_rows(
 			}
 		)
 
+	combined.sort(
+		key=lambda row: (
+			parse_clock_minutes(row.get("Time", "")),
+			0 if row.get("Type") == "Schedule" else 1,
+			row.get("Event", ""),
+		)
+	)
+
 	return combined
 
 
@@ -174,26 +199,8 @@ def build_day_run_orders(config: dict, order12_rows: list[dict]) -> dict[str, li
 		"tuesday": order12_rows,
 		"wednesday": order12_rows,
 		"thursday": order12_rows,
-		"friday": [
-			{
-				"Run": "Show",
-				"Time": "7:00 PM",
-				"Domin": "Performance",
-				"DominPerformer": "",
-				"Alquist": "",
-				"AlquistPerformer": "",
-			}
-		],
-		"saturday": [
-			{
-				"Run": "Show",
-				"Time": "7:00 PM",
-				"Domin": "Performance",
-				"DominPerformer": "",
-				"Alquist": "",
-				"AlquistPerformer": "",
-			}
-		],
+		"friday": order12_rows,
+		"saturday": order12_rows,
 	}
 	return day_runs
 

@@ -31,8 +31,7 @@ performers:
 week_timeline:
   - day: "Monday, Feb 23"
     day_notes:
-      - "Muppet/Shirt/Robot combinations until Q2Q."
-      - "Monday Run 1-4: work in show elements."
+      - "Monday begins with a 5:30 PM tech call and a 6:00 PM actor call, then moves into run work at 6:45 PM with Run 1 through Run 4 focused on work in show elements before Q2Q begins at 9:30 PM and the day hard-outs at 11:00 PM."
     entries:
       - {time: "5:30 PM", event: "Tech Call", notes: "SM/Crew prep"}
       - {time: "6:00 PM", event: "Actors Call", notes: ""}
@@ -42,18 +41,16 @@ week_timeline:
       - {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
   - day: "Tuesday, Feb 24"
     day_notes:
-      - "Order 12 full run at 7:00 PM."
+      - "Tuesday starts with a 6:15 PM tech call and a 6:45 PM actor call, includes open stage work from 6:30 PM to 7:00 PM, and runs the full Order 12 sequence beginning at 7:00 PM through the 11:00 PM hard out."
     entries:
       - {time: "6:15 PM", event: "Tech Call", notes: ""}
       - {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
       - {time: "6:45 PM", event: "Actors Call", notes: ""}
       - {time: "7:00 PM", event: "Full Run", notes: "Run of 12 following show order"}
-      - {time: "8:30 PM", event: "Break", notes: "10 minutes after run"}
-      - {time: "8:40 PM", event: "Work Pieces", notes: "Continue work until hard out"}
       - {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
   - day: "Wednesday, Feb 25"
     day_notes:
-      - "Invited tech: professors will be watching."
+      - "Tuesday starts with a 6:15 PM tech call and a 6:45 PM actor call, includes open stage work from 6:30 PM to 7:00 PM, and runs the full Order 12 sequence beginning at 7:00 PM through the 11:00 PM hard out."
     entries:
       - {time: "6:15 PM", event: "Tech Call", notes: "Invited tech"}
       - {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
@@ -64,7 +61,7 @@ week_timeline:
       - {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
   - day: "Thursday, Feb 26"
     day_notes:
-      - "Session recorded for research project."
+      - "Tuesday starts with a 6:15 PM tech call and a 6:45 PM actor call, includes open stage work from 6:30 PM to 7:00 PM, and runs the full Order 12 sequence beginning at 7:00 PM through the 11:00 PM hard out."
     entries:
       - {time: "6:15 PM", event: "Tech Call", notes: "Recorded for research project"}
       - {time: "6:30 PM", event: "Open Stage", notes: "Actors can work on open stage until 7:00 PM"}
@@ -75,14 +72,14 @@ week_timeline:
       - {time: "11:00 PM", event: "Hard Out", notes: "End of day"}
   - day: "Friday, Feb 27"
     day_notes:
-      - "Show day. Show starts at 7:00 PM."
+      - "Friday is a show day with SM and crew called at 6:00 PM, actors called at 6:30 PM, and show time at 7:00 PM with the show order sequence included."
     entries:
       - {time: "6:00 PM", event: "SM/Crew Call", notes: ""}
       - {time: "6:30 PM", event: "Actors Call", notes: ""}
       - {time: "7:00 PM", event: "Show Time", notes: ""}
   - day: "Saturday, Feb 28"
     day_notes:
-      - "Show day. Show starts at 7:00 PM."
+      - "Saturday is a show day with SM and crew called at 6:00 PM, actors called at 6:30 PM, and show time at 7:00 PM with the show order sequence included."
     entries:
       - {time: "6:00 PM", event: "SM/Crew Call", notes: ""}
       - {time: "6:30 PM", event: "Actors Call", notes: ""}

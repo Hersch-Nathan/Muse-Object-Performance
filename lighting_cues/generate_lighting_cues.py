@@ -289,6 +289,16 @@ def build_qlab_rows(config: dict, eos_rows: list[dict]) -> list[dict]:
     typo_fixes = config.get("typo_fixes", {})
     cue_type_keywords = config.get("cue_type_keywords", {})
 
+    def format_eos_display(q_number: str) -> str:
+        if not q_number:
+            return ""
+        if "." in q_number:
+            main, suffix = q_number.split(".", 1)
+        else:
+            main, suffix = q_number, ""
+        main_stripped = main.lstrip("0") or "0"
+        return f"{main_stripped}.{suffix}" if suffix else main_stripped
+
     eos_map = {row["Q"]: row["Name"] for row in eos_rows}
     base_q_csv = config.get("base_q_csv", "lightingcues.csv")
     base_cues = load_base_cues(
@@ -314,13 +324,21 @@ def build_qlab_rows(config: dict, eos_rows: list[dict]) -> list[dict]:
                 {
                     "qlab q": base_q,
                     "qlab name": look,
-                    "eos q number": eos_q,
+                    "eos q number": format_eos_display(eos_q),
                     "eos name": eos_map.get(eos_q, ""),
                 }
             )
             continue
 
         if mode == "single":
+            rows.append(
+                {
+                    "qlab q": base_q,
+                    "qlab name": look,
+                    "eos q number": "",
+                    "eos name": "",
+                }
+            )
             cue_type = keyword_cue_type(
                 look,
                 cue_type_keywords.get("single", []),
@@ -337,12 +355,20 @@ def build_qlab_rows(config: dict, eos_rows: list[dict]) -> list[dict]:
                     {
                         "qlab q": qlab_q,
                         "qlab name": f"{look} - {obj}",
-                        "eos q number": eos_q,
+                        "eos q number": format_eos_display(eos_q),
                         "eos name": eos_map.get(eos_q, ""),
                     }
                 )
             continue
 
+        rows.append(
+            {
+                "qlab q": base_q,
+                "qlab name": look,
+                "eos q number": "",
+                "eos name": "",
+            }
+        )
         cue_type = keyword_cue_type(
             look,
             cue_type_keywords.get("double", []),
@@ -363,7 +389,7 @@ def build_qlab_rows(config: dict, eos_rows: list[dict]) -> list[dict]:
                 {
                     "qlab q": qlab_q,
                     "qlab name": f"{look} - {first}+{second}",
-                    "eos q number": eos_q,
+                    "eos q number": format_eos_display(eos_q),
                     "eos name": eos_map.get(eos_q, ""),
                 }
             )

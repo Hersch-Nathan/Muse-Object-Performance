@@ -1,13 +1,16 @@
-1,Preshow,001,General Preshow
-10,Blackout,002,General Blackout
+1,Preshow,1,General Preshow
+10,Blackout,2,General Blackout
+20,Domin Base,,
 20.1,Domin Base - Shirt,101,Shirt Base
 20.2,Domin Base - Muppet,201,Muppet Base
 20.3,Domin Base - Animatronic,301,Animatronic Base
 20.4,Domin Base - Robot,401,Robot Base
+30,Domin Bump,,
 30.1,Domin Bump - Shirt,102,Shirt Bump
 30.2,Domin Bump - Muppet,202,Muppet Bump
 30.3,Domin Bump - Animatronic,302,Animatronic Bump
 30.4,Domin Bump - Robot,402,Robot Bump
+40,Alquist + Domin Base,,
 40.52,Alquist + Domin Base - Shirt+Muppet,521,Shirt+Muppet
 40.53,Alquist + Domin Base - Shirt+Animatronic,531,Shirt+Animatronic
 40.54,Alquist + Domin Base - Shirt+Robot,541,Shirt+Robot
@@ -20,14 +23,17 @@
 40.81,Alquist + Domin Base - Robot+Shirt,811,Robot+Shirt
 40.82,Alquist + Domin Base - Robot+Muppet,821,Robot+Muppet
 40.83,Alquist + Domin Base - Robot+Animatronic,831,Robot+Animatronic
+50,Alquist Base,,
 50.1,Alquist Base - Shirt,101,Shirt Base
 50.2,Alquist Base - Muppet,201,Muppet Base
 50.3,Alquist Base - Animatronic,301,Animatronic Base
 50.4,Alquist Base - Robot,401,Robot Base
+60,Believer Look (Alquist),,
 60.1,Believer Look (Alquist) - Shirt,103,Shirt Believe
 60.2,Believer Look (Alquist) - Muppet,203,Muppet Believe
 60.3,Believer Look (Alquist) - Animatronic,303,Animatronic Believe
 60.4,Believer Look (Alquist) - Robot,403,Robot Believe
+70,Alquist + Domin Base,,
 70.52,Alquist + Domin Base - Shirt+Muppet,521,Shirt+Muppet
 70.53,Alquist + Domin Base - Shirt+Animatronic,531,Shirt+Animatronic
 70.54,Alquist + Domin Base - Shirt+Robot,541,Shirt+Robot
@@ -40,6 +46,7 @@
 70.81,Alquist + Domin Base - Robot+Shirt,811,Robot+Shirt
 70.82,Alquist + Domin Base - Robot+Muppet,821,Robot+Muppet
 70.83,Alquist + Domin Base - Robot+Animatronic,831,Robot+Animatronic
+80,Half Alquist + Domin Full,,
 80.52,Half Alquist + Domin Full - Shirt+Muppet,523,half Shirt+Muppet
 80.53,Half Alquist + Domin Full - Shirt+Animatronic,533,half Shirt+Animatronic
 80.54,Half Alquist + Domin Full - Shirt+Robot,543,half Shirt+Robot
@@ -52,6 +59,7 @@
 80.81,Half Alquist + Domin Full - Robot+Shirt,813,half Robot+Shirt
 80.82,Half Alquist + Domin Full - Robot+Muppet,823,half Robot+Muppet
 80.83,Half Alquist + Domin Full - Robot+Animatronic,833,half Robot+Animatronic
+90,Half Alquist + Domin Full Colored,,
 90.52,Half Alquist + Domin Full Colored - Shirt+Muppet,524,half Shirt+Muppet colored
 90.53,Half Alquist + Domin Full Colored - Shirt+Animatronic,534,half Shirt+Animatronic colored
 90.54,Half Alquist + Domin Full Colored - Shirt+Robot,544,half Shirt+Robot colored
@@ -64,6 +72,7 @@
 90.81,Half Alquist + Domin Full Colored - Robot+Shirt,814,half Robot+Shirt colored
 90.82,Half Alquist + Domin Full Colored - Robot+Muppet,824,half Robot+Muppet colored
 90.83,Half Alquist + Domin Full Colored - Robot+Animatronic,834,half Robot+Animatronic colored
+100,Alquist Base + Domin Colored,,
 100.52,Alquist Base + Domin Colored - Shirt+Muppet,522,Shirt+Muppet colored
 100.53,Alquist Base + Domin Colored - Shirt+Animatronic,532,Shirt+Animatronic colored
 100.54,Alquist Base + Domin Colored - Shirt+Robot,542,Shirt+Robot colored
@@ -76,24 +85,29 @@
 100.81,Alquist Base + Domin Colored - Robot+Shirt,812,Robot+Shirt colored
 100.82,Alquist Base + Domin Colored - Robot+Muppet,822,Robot+Muppet colored
 100.83,Alquist Base + Domin Colored - Robot+Animatronic,832,Robot+Animatronic colored
+110,Alquist Base,,
 110.1,Alquist Base - Shirt,101,Shirt Base
 110.2,Alquist Base - Muppet,201,Muppet Base
 110.3,Alquist Base - Animatronic,301,Animatronic Base
 110.4,Alquist Base - Robot,401,Robot Base
+120,Servant Look (Alquist),,
 120.1,Servant Look (Alquist) - Shirt,104,Shirt Servant Look
 120.2,Servant Look (Alquist) - Muppet,204,Muppet Servant Look
 120.3,Servant Look (Alquist) - Animatronic,304,Animatronic Servant Look
 120.4,Servant Look (Alquist) - Robot,404,Robot Servant Look
+130,Alquist Red,,
 130.1,Alquist Red - Shirt,105,Shirt Red
 130.2,Alquist Red - Muppet,205,Muppet Red
 130.3,Alquist Red - Animatronic,305,Animatronic Red
 130.4,Alquist Red - Robot,405,Robot Red
+140,Alquist Dim Blue,,
 140.1,Alquist Dim Blue - Shirt,106,Shirt Dim Blue
 140.2,Alquist Dim Blue - Muppet,206,Muppet Dim Blue
 140.3,Alquist Dim Blue - Animatronic,306,Animatronic Dim Blue
 140.4,Alquist Dim Blue - Robot,406,Robot Dim Blue
+150,Alquist Base,,
 150.1,Alquist Base - Shirt,101,Shirt Base
 150.2,Alquist Base - Muppet,201,Muppet Base
 150.3,Alquist Base - Animatronic,301,Animatronic Base
 150.4,Alquist Base - Robot,401,Robot Base
-160,Blackout,002,General Blackout
+160,Blackout,2,General Blackout

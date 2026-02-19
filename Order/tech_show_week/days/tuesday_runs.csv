@@ -1,8 +1,4 @@
 Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes
-Run 1,,Shirt,,Muppet,,Monday Q2Q sequence
-Run 2,,Muppet,,Shirt,,Monday Q2Q sequence
-Run 3,,Animatronic,,Robot,,Monday Q2Q sequence
-Run 4,,Robot,,Animatronic,,Monday Q2Q sequence
 1,7:00 PM,Shirt,Moose,Muppet,Luca,Order 12 from base schedule generator
 2,7:14 PM,Robot,Luca,Animatronic,None,Order 12 from base schedule generator
 3,7:28 PM,Muppet,Luca,Shirt,Moose,Order 12 from base schedule generator

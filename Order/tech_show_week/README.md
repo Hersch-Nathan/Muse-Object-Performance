@@ -2,10 +2,14 @@
 
 This folder generates a single DRAFT PDF schedule for tech/show week.
 
+It uses the existing Order generator (`../generate_schedule.py`) and reads
+`../show_order.csv` for the Order 12 run sequence shown on Tuesday-Thursday pages.
+
 ## Outputs
 
 - `general_show_order.csv`
-- `week_timeline.csv`
+- `days/*_timeline.csv`
+- `days/*_runs.csv`
 - `performers/moose.csv`
 - `performers/luca.csv`
 - `tech_show_week.pdf`

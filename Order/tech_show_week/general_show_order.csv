@@ -1,18 +1,18 @@
 Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes
-Run 1,,Shirt,,Muppet,,Monday Q2Q sequence
-Run 2,,Muppet,,Shirt,,Monday Q2Q sequence
-Run 3,,Animatronic,,Robot,,Monday Q2Q sequence
-Run 4,,Robot,,Animatronic,,Monday Q2Q sequence
-1,7:00 PM,Shirt,Moose,Muppet,Luca,Order 12 from base schedule generator
-2,7:14 PM,Robot,Luca,Animatronic,None,Order 12 from base schedule generator
-3,7:28 PM,Muppet,Luca,Shirt,Moose,Order 12 from base schedule generator
-4,7:42 PM,Shirt,Moose,Robot,Luca,Order 12 from base schedule generator
-5,7:56 PM,Animatronic,None,Shirt,Moose,Order 12 from base schedule generator
-6,8:10 PM,Robot,Moose,Muppet,Luca,Order 12 from base schedule generator
+Run 1,,Shirt,,Muppet,,work in show elements
+Run 2,,Muppet,,Shirt,,work in show elements
+Run 3,,Animatronic,,Robot,,work in show elements
+Run 4,,Robot,,Animatronic,,work in show elements
+1,7:00 PM,Animatronic,None,Shirt,Moose,Order 12 from base schedule generator
+2,7:14 PM,Shirt,Moose,Robot,Luca,Order 12 from base schedule generator
+3,7:28 PM,Animatronic,None,Muppet,Moose,Order 12 from base schedule generator
+4,7:42 PM,Muppet,Moose,Shirt,Luca,Order 12 from base schedule generator
+5,7:56 PM,Robot,Luca,Animatronic,None,Order 12 from base schedule generator
+6,8:10 PM,Muppet,Moose,Robot,Luca,Order 12 from base schedule generator
 Intermission,8:24 PM,,,,,Intermission
-7,8:34 PM,Muppet,Luca,Animatronic,None,Order 12 from base schedule generator
-8,8:48 PM,Robot,Luca,Shirt,Moose,Order 12 from base schedule generator
-9,9:02 PM,Animatronic,None,Muppet,Luca,Order 12 from base schedule generator
-10,9:16 PM,Muppet,Luca,Robot,Moose,Order 12 from base schedule generator
-11,9:30 PM,Shirt,Moose,Animatronic,None,Order 12 from base schedule generator
-12,9:44 PM,Animatronic,None,Robot,Luca,Order 12 from base schedule generator
+7,8:34 PM,Shirt,Luca,Animatronic,None,Order 12 from base schedule generator
+8,8:48 PM,Robot,Luca,Muppet,Moose,Order 12 from base schedule generator
+9,9:02 PM,Animatronic,None,Robot,Luca,Order 12 from base schedule generator
+10,9:16 PM,Robot,Luca,Shirt,Moose,Order 12 from base schedule generator
+11,9:30 PM,Muppet,Moose,Animatronic,None,Order 12 from base schedule generator
+12,9:44 PM,Shirt,Luca,Muppet,Moose,Order 12 from base schedule generator

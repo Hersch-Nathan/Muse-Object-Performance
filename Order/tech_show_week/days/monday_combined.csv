@@ -1,0 +1,11 @@
+Time,Type,Event,Domin,DominPerformer,Alquist,AlquistPerformer
+5:30 PM,Schedule,Tech Call,,,,
+6:00 PM,Schedule,Actors Call,,,,
+6:45 PM,Schedule,Runs Start,,,,
+8:00 PM,Schedule,Break,,,,
+9:30 PM,Schedule,Q2Q,,,,
+11:00 PM,Schedule,Hard Out,,,,
+,Run,Run 1,Shirt,,Muppet,
+,Run,Run 2,Muppet,,Shirt,
+,Run,Run 3,Animatronic,,Robot,
+,Run,Run 4,Robot,,Animatronic,

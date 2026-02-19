@@ -1,5 +1,5 @@
-Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes
-Run 1,,Shirt,,Muppet,,work in show elements
-Run 2,,Muppet,,Shirt,,work in show elements
-Run 3,,Animatronic,,Robot,,work in show elements
-Run 4,,Robot,,Animatronic,,work in show elements
+Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer
+Run 1,,Shirt,,Muppet,
+Run 2,,Muppet,,Shirt,
+Run 3,,Animatronic,,Robot,
+Run 4,,Robot,,Animatronic,

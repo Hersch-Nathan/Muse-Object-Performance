@@ -1,14 +1,14 @@
-Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,Notes
-1,7:00 PM,Animatronic,None,Shirt,Moose,Order 12 from base schedule generator
-2,7:14 PM,Shirt,Moose,Robot,Luca,Order 12 from base schedule generator
-3,7:28 PM,Animatronic,None,Muppet,Moose,Order 12 from base schedule generator
-4,7:42 PM,Muppet,Moose,Shirt,Luca,Order 12 from base schedule generator
-5,7:56 PM,Robot,Luca,Animatronic,None,Order 12 from base schedule generator
-6,8:10 PM,Muppet,Moose,Robot,Luca,Order 12 from base schedule generator
-Intermission,8:24 PM,,,,,Intermission
-7,8:34 PM,Shirt,Luca,Animatronic,None,Order 12 from base schedule generator
-8,8:48 PM,Robot,Luca,Muppet,Moose,Order 12 from base schedule generator
-9,9:02 PM,Animatronic,None,Robot,Luca,Order 12 from base schedule generator
-10,9:16 PM,Robot,Luca,Shirt,Moose,Order 12 from base schedule generator
-11,9:30 PM,Muppet,Moose,Animatronic,None,Order 12 from base schedule generator
-12,9:44 PM,Shirt,Luca,Muppet,Moose,Order 12 from base schedule generator
+Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer
+1,7:00 PM,Muppet,Moose,Shirt,Luca
+2,7:14 PM,Shirt,Luca,Animatronic,None
+3,7:28 PM,Animatronic,None,Muppet,Moose
+4,7:42 PM,Robot,Moose,Animatronic,None
+5,7:56 PM,Shirt,Moose,Muppet,Luca
+6,8:10 PM,Animatronic,None,Robot,Moose
+Intermission,8:24 PM,,,,
+7,8:34 PM,Muppet,Luca,Animatronic,None
+8,8:48 PM,Robot,Luca,Shirt,Moose
+9,9:02 PM,Muppet,Moose,Robot,Luca
+10,9:16 PM,Animatronic,None,Shirt,Luca
+11,9:30 PM,Shirt,Luca,Robot,Moose
+12,9:44 PM,Robot,Moose,Muppet,Luca

@@ -62,8 +62,38 @@ def build_object_pair_sequence(
     counts = {pair: 0 for pair in pairs}
     sequence: list[tuple[str, str]] = []
     rng = random.Random(random_seed)
+    has_intermission_boundary = intermission_every > 0 and intermission_every < run_count
+    virtual_boundary_runs = None
+    if none_before_after and animatronic_obj and not has_intermission_boundary:
+        virtual_boundary_runs = RulesEngine.no_intermission_boundary_runs(run_count)
 
     def can_use(pair: tuple[str, str], remaining_runs_after: int) -> bool:
+        run_number = len(sequence) + 1
+        if virtual_boundary_runs:
+            before_run, after_run = virtual_boundary_runs
+            if run_number == before_run and pair[0] != animatronic_obj:
+                return False
+            if run_number == after_run and pair[1] != animatronic_obj:
+                return False
+
+        if RulesEngine.violates_virtual_boundary_buffer(
+            run_number,
+            pair,
+            animatronic_obj,
+            virtual_boundary_runs,
+            buffer_runs=1,
+        ):
+            return False
+
+        if RulesEngine.violates_animatronic_consecutive_gap(
+            run_number,
+            pair,
+            sequence,
+            animatronic_obj,
+            virtual_boundary_runs,
+        ):
+            return False
+
         new_count = counts[pair] + 1
         if new_count > base + 1:
             return False
@@ -94,7 +124,14 @@ def build_object_pair_sequence(
         return True
 
     def prefer_animatronic(pair: tuple[str, str], run_number: int) -> int:
-        if not none_before_after or not animatronic_obj or intermission_every <= 0:
+        if not none_before_after or not animatronic_obj or not has_intermission_boundary:
+            if not virtual_boundary_runs:
+                return 0
+            before_run, after_run = virtual_boundary_runs
+            if run_number == before_run:
+                return 1 if pair[0] == animatronic_obj else 0
+            if run_number == after_run:
+                return 1 if pair[1] == animatronic_obj else 0
             return 0
         if run_number % intermission_every == 0 and run_number != run_count:
             return 1 if pair[0] == animatronic_obj else 0
@@ -124,7 +161,22 @@ def build_object_pair_sequence(
         ]
         rng.shuffle(candidates)
         candidates.sort(
-            key=lambda pair: (counts[pair], -prefer_animatronic(pair, run_number))
+            key=lambda pair: (
+                counts[pair],
+                RulesEngine.first_run_animatronic_penalty(
+                    run_number,
+                    pair,
+                    animatronic_obj,
+                ),
+                RulesEngine.animatronic_density_penalty(
+                    run_number,
+                    pair,
+                    sequence,
+                    animatronic_obj,
+                    virtual_boundary_runs,
+                ),
+                -prefer_animatronic(pair, run_number),
+            )
         )
 
         for pair in candidates:
@@ -145,11 +197,22 @@ def build_object_pair_sequence(
     return sequence
 
 
-def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[str]]:
+def build_rows(
+    config: dict,
+) -> tuple[
+    list[dict],
+    dict[str, list[dict]],
+    list[str],
+    list[dict],
+    list[str],
+    list[dict],
+    list[str],
+]:
     show = config["show"]
     characters = config["characters"]
     objects = config["objects"]
     all_performers = config.get("performers", [])
+    real_performers = [name for name in all_performers if name != "None"]
 
     for obj in objects:
         if obj.get("performers") == ["all"]:
@@ -181,6 +244,12 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
     current_time = start_time
 
     object_names = [obj["name"] for obj in objects]
+    object_role_counts: dict[str, dict[str, int]] = {
+        name: {"DominCount": 0, "AlquistCount": 0} for name in object_names
+    }
+    performer_role_counts: dict[str, dict[str, int]] = {
+        name: {"DominCount": 0, "AlquistCount": 0} for name in real_performers
+    }
 
     performer_rows: dict[str, list[dict]] = {
         name: [] for name in all_performers if name != "None"
@@ -242,6 +311,12 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
                     domin_candidate, alquist_candidate
                 ):
                     continue
+                if not rules.rule13_consecutive_animatronic_partner_diff(
+                    domin_candidate,
+                    alquist_candidate,
+                    animatronic_perm,
+                ):
+                    continue
 
                 score = rules.score_permutation(
                     domin_candidate,
@@ -268,6 +343,33 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
         row["DominPerformer"] = domin_performer
         row["Alquist"] = alquist_obj
         row["AlquistPerformer"] = alquist_performer
+
+        present_performers = {
+            performer
+            for performer in (domin_performer, alquist_performer)
+            if performer != "None"
+        }
+        missing_performer = ""
+        for performer in real_performers:
+            if performer not in present_performers:
+                missing_performer = performer
+                break
+
+        row["DominVoice"] = (
+            missing_performer if domin_obj == "Animatronic" else domin_performer
+        )
+        row["AlquistVoice"] = (
+            missing_performer if alquist_obj == "Animatronic" else alquist_performer
+        )
+
+        if domin_obj in object_role_counts:
+            object_role_counts[domin_obj]["DominCount"] += 1
+        if alquist_obj in object_role_counts:
+            object_role_counts[alquist_obj]["AlquistCount"] += 1
+        if domin_performer in performer_role_counts:
+            performer_role_counts[domin_performer]["DominCount"] += 1
+        if alquist_performer in performer_role_counts:
+            performer_role_counts[alquist_performer]["AlquistCount"] += 1
 
         rules.record_run(domin_perm, alquist_perm)
 
@@ -327,6 +429,8 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
                 "DominPerformer": "",
                 "Alquist": "",
                 "AlquistPerformer": "",
+                "DominVoice": "",
+                "AlquistVoice": "",
             }
             master_rows.append(intermission_row)
 
@@ -343,8 +447,85 @@ def build_rows(config: dict) -> tuple[list[dict], dict[str, list[dict]], list[st
 
             current_time += timedelta(minutes=intermission_length)
 
-    headers = ["Run", "Time", "Domin", "DominPerformer", "Alquist", "AlquistPerformer"]
-    return master_rows, performer_rows, headers
+    master_rows.append(
+        {
+            "Run": "Show end",
+            "Time": format_time(current_time),
+            "Domin": "",
+            "DominPerformer": "",
+            "Alquist": "",
+            "AlquistPerformer": "",
+            "DominVoice": "",
+            "AlquistVoice": "",
+        }
+    )
+
+    headers = [
+        "Run",
+        "Time",
+        "Domin",
+        "DominPerformer",
+        "Alquist",
+        "AlquistPerformer",
+        "DominVoice",
+        "AlquistVoice",
+    ]
+
+    object_count_rows: list[dict] = []
+    for object_name in object_names:
+        domin_count = object_role_counts[object_name]["DominCount"]
+        alquist_count = object_role_counts[object_name]["AlquistCount"]
+        total_count = domin_count + alquist_count
+        object_count_rows.append(
+            {
+                "Object": object_name,
+                "DominCount": str(domin_count),
+                "AlquistCount": str(alquist_count),
+                "TotalCount": str(total_count),
+                "TotalRuns": str(run_count),
+            }
+        )
+
+    object_count_headers = [
+        "Object",
+        "DominCount",
+        "AlquistCount",
+        "TotalCount",
+        "TotalRuns",
+    ]
+
+    performer_count_rows: list[dict] = []
+    for performer_name in real_performers:
+        domin_count = performer_role_counts[performer_name]["DominCount"]
+        alquist_count = performer_role_counts[performer_name]["AlquistCount"]
+        total_count = domin_count + alquist_count
+        performer_count_rows.append(
+            {
+                "Performer": performer_name,
+                "DominCount": str(domin_count),
+                "AlquistCount": str(alquist_count),
+                "TotalCount": str(total_count),
+                "TotalRuns": str(run_count),
+            }
+        )
+
+    performer_count_headers = [
+        "Performer",
+        "DominCount",
+        "AlquistCount",
+        "TotalCount",
+        "TotalRuns",
+    ]
+
+    return (
+        master_rows,
+        performer_rows,
+        headers,
+        object_count_rows,
+        object_count_headers,
+        performer_count_rows,
+        performer_count_headers,
+    )
 
 
 def write_csv(path: str, headers: list[str], rows: list[dict]) -> None:
@@ -358,12 +539,24 @@ def main() -> None:
     base_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(base_dir, "config.yaml")
     output_path = os.path.join(base_dir, "show_order.csv")
+    object_counts_path = os.path.join(base_dir, "object_role_counts.csv")
+    performer_counts_path = os.path.join(base_dir, "performer_role_counts.csv")
     performers_dir = os.path.join(base_dir, "performers")
 
     config = load_config(config_path)
-    master_rows, performer_rows, headers = build_rows(config)
+    (
+        master_rows,
+        performer_rows,
+        headers,
+        object_count_rows,
+        object_count_headers,
+        performer_count_rows,
+        performer_count_headers,
+    ) = build_rows(config)
 
     write_csv(output_path, headers, master_rows)
+    write_csv(object_counts_path, object_count_headers, object_count_rows)
+    write_csv(performer_counts_path, performer_count_headers, performer_count_rows)
 
     ensure_output_dir(performers_dir)
     performer_headers = [

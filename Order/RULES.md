@@ -83,8 +83,28 @@ This document defines the rules for valid show order scheduling.
 - After intermission: Other position gets Animatronic
 - Soft rule: Skip if hard rules would be violated
 
+**Rule 10b: No-Intermission Middle Boundary (None_Before_After)**
+- If no actual intermission boundary occurs in the schedule, treat the two middle runs as a virtual boundary
+- For odd run counts, use runs $(\lfloor R/2 \rfloor + 1)$ and $(\lfloor R/2 \rfloor + 2)$ (example: $R=9 \Rightarrow 5,6$)
+- For even run counts, use the central pair (example: $R=8 \Rightarrow 4,5$)
+- Apply the same boundary pattern: first middle run prefers Animatronic in Domin, second middle run prefers Animatronic in Alquist
+
+**Rule 10c: Animatronic Spacing Around Virtual Boundary**
+- When using the virtual middle boundary, avoid placing Animatronic on runs directly adjacent to those two middle runs
+- Prefer larger gaps between additional Animatronic appearances to avoid clustering
+
 **Rule 11: Avoid None on First/Last Run**
 - Prefer runs 1 and $R$ to use real performers (no "None")
+
+**Rule 12: Prefer Non-Animatronic Opening Run**
+- Soft preference: avoid starting the show with Animatronic in run 1 when alternatives satisfy hard rules
+
+**Rule 13: Consecutive Animatronic Partner Must Switch**
+- If two consecutive runs both include Animatronic, the non-Animatronic object must be performed by different performers across those two runs
+- Example target: run 5 pairs with Luca, run 6 pairs with Moose
+
+**Rule 14: Continue Animatronic Partner Rotation**
+- After the consecutive Animatronic pair, prefer alternating the paired performer on future Animatronic runs
 
 ## Implementation Order
 

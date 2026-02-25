@@ -56,6 +56,114 @@ class RulesEngine:
             self._apply_counts(run["Domin"], "Domin")
             self._apply_counts(run["Alquist"], "Alquist")
 
+    @staticmethod
+    def no_intermission_boundary_runs(total_runs: int) -> tuple[int, int] | None:
+        """
+        Return the two run numbers that act as virtual intermission boundaries.
+
+        For odd run counts, this chooses center and center+1 (e.g. 9 -> 5,6).
+        For even run counts, this chooses the central pair (e.g. 8 -> 4,5).
+        """
+        if total_runs < 2:
+            return None
+        before_boundary = (total_runs + 1) // 2
+        after_boundary = before_boundary + 1
+        if after_boundary > total_runs:
+            return None
+        return before_boundary, after_boundary
+
+    @staticmethod
+    def pair_contains_object(pair: tuple[str, str], object_name: str | None) -> bool:
+        if not object_name:
+            return False
+        return object_name in pair
+
+    @staticmethod
+    def first_run_animatronic_penalty(
+        run_number: int,
+        pair: tuple[str, str],
+        animatronic_obj: str | None,
+    ) -> int:
+        if run_number != 1 or not animatronic_obj:
+            return 0
+        return 1 if animatronic_obj in pair else 0
+
+    @staticmethod
+    def violates_animatronic_consecutive_gap(
+        run_number: int,
+        pair: tuple[str, str],
+        sequence: list[tuple[str, str]],
+        animatronic_obj: str | None,
+        boundary_runs: tuple[int, int] | None,
+    ) -> bool:
+        if not animatronic_obj:
+            return False
+        if animatronic_obj not in pair:
+            return False
+        if not sequence:
+            return False
+        if animatronic_obj not in sequence[-1]:
+            return False
+
+        if boundary_runs:
+            before_run, after_run = boundary_runs
+            if run_number == after_run and run_number - 1 == before_run:
+                return False
+
+        return True
+
+    @staticmethod
+    def violates_virtual_boundary_buffer(
+        run_number: int,
+        pair: tuple[str, str],
+        animatronic_obj: str | None,
+        boundary_runs: tuple[int, int] | None,
+        buffer_runs: int = 1,
+    ) -> bool:
+        if not animatronic_obj or not boundary_runs:
+            return False
+        if animatronic_obj not in pair:
+            return False
+
+        before_run, after_run = boundary_runs
+        if run_number in (before_run, after_run):
+            return False
+
+        return min(abs(run_number - before_run), abs(run_number - after_run)) <= buffer_runs
+
+    @staticmethod
+    def animatronic_density_penalty(
+        run_number: int,
+        pair: tuple[str, str],
+        sequence: list[tuple[str, str]],
+        animatronic_obj: str | None,
+        boundary_runs: tuple[int, int] | None,
+    ) -> int:
+        if not animatronic_obj or animatronic_obj not in pair:
+            return 0
+
+        penalty = 0
+        for offset, previous_pair in enumerate(reversed(sequence), start=1):
+            if animatronic_obj in previous_pair:
+                if offset == 1:
+                    penalty += 100
+                elif offset == 2:
+                    penalty += 40
+                elif offset == 3:
+                    penalty += 15
+                break
+
+        if boundary_runs:
+            before_run, after_run = boundary_runs
+            if run_number not in (before_run, after_run):
+                distance = min(abs(run_number - before_run), abs(run_number - after_run))
+                if distance == 1:
+                    penalty += 80
+                elif distance == 2:
+                    penalty += 30
+
+        return penalty
+
     def _apply_counts(self, perm: Tuple[str, str], position: str) -> None:
         """Apply a permutation to counts."""
         obj, performer = perm
@@ -353,6 +461,83 @@ class RulesEngine:
 
         return 0
 
+    @staticmethod
+    def _animatronic_partner_performer(
+        domin_perm: Tuple[str, str],
+        alquist_perm: Tuple[str, str],
+        animatronic_perm: Tuple[str, str] | None,
+    ) -> str | None:
+        if not animatronic_perm:
+            return None
+
+        anim_obj, anim_perf = animatronic_perm
+        if domin_perm == (anim_obj, anim_perf):
+            return alquist_perm[1]
+        if alquist_perm == (anim_obj, anim_perf):
+            return domin_perm[1]
+        return None
+
+    def rule13_consecutive_animatronic_partner_diff(
+        self,
+        domin_perm: Tuple[str, str],
+        alquist_perm: Tuple[str, str],
+        animatronic_perm: Tuple[str, str] | None,
+    ) -> bool:
+        """
+        If two consecutive runs both include Animatronic, the paired performer
+        for the non-Animatronic object must be different.
+        """
+        if not self.run_history or not animatronic_perm:
+            return True
+
+        last_run = self.run_history[-1]
+        anim_obj, anim_perf = animatronic_perm
+
+        last_partner = self._animatronic_partner_performer(
+            last_run["Domin"],
+            last_run["Alquist"],
+            animatronic_perm,
+        )
+        current_partner = self._animatronic_partner_performer(
+            domin_perm,
+            alquist_perm,
+            animatronic_perm,
+        )
+
+        if last_partner is None or current_partner is None:
+            return True
+
+        return last_partner != current_partner
+
+    def _animatronic_rotation_penalty(
+        self,
+        domin_perm: Tuple[str, str],
+        alquist_perm: Tuple[str, str],
+        animatronic_perm: Tuple[str, str] | None,
+    ) -> int:
+        """Soft preference to alternate performer paired with Animatronic over time."""
+        current_partner = self._animatronic_partner_performer(
+            domin_perm,
+            alquist_perm,
+            animatronic_perm,
+        )
+        if current_partner is None:
+            return 0
+
+        for previous_run in reversed(self.run_history):
+            previous_partner = self._animatronic_partner_performer(
+                previous_run["Domin"],
+                previous_run["Alquist"],
+                animatronic_perm,
+            )
+            if previous_partner is None:
+                continue
+            if previous_partner == current_partner:
+                return 20
+            return 0
+
+        return 0
+
     def score_permutation(
         self,
         domin_perm: Tuple[str, str],
@@ -380,6 +565,11 @@ class RulesEngine:
             is_after_intermission,
             animatronic_perm,
         )
+        animatronic_rotation_penalty = self._animatronic_rotation_penalty(
+            domin_perm,
+            alquist_perm,
+            animatronic_perm,
+        )
 
         end_run_penalty = 0
         if run_number is not None:
@@ -387,7 +577,13 @@ class RulesEngine:
                 domin_perm, alquist_perm, run_number
             )
 
-        return (gap_score * 10) - balance_penalty - intermission_penalty - end_run_penalty
+        return (
+            (gap_score * 10)
+            - balance_penalty
+            - intermission_penalty
+            - animatronic_rotation_penalty
+            - end_run_penalty
+        )
 
     def record_run(self, domin_perm: Tuple[str, str], alquist_perm: Tuple[str, str]) -> None:
         """

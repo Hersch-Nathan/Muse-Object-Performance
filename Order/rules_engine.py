@@ -11,6 +11,8 @@ class RulesEngine:
         performers: List[str],
         objects: List[str],
         total_runs: int,
+        object_performers: Dict[str, List[str]] | None = None,
+        object_total_counts: Dict[str, int] | None = None,
         run_history: List[Dict] = None,
     ):
         """
@@ -20,11 +22,17 @@ class RulesEngine:
             performers: List of performer names (excluding "None")
             objects: List of object names
             total_runs: Total number of scheduled runs
+            object_performers: Mapping of object -> eligible performers
+            object_total_counts: Mapping of object -> total appearances in schedule
             run_history: List of dicts like {"Domin": (obj, performer), "Alquist": (obj, performer)}
         """
         self.performers = [p for p in performers if p != "None"]
         self.objects = objects
         self.total_runs = total_runs
+        self.object_performers = object_performers or {
+            obj: self.performers.copy() for obj in self.objects
+        }
+        self.object_total_counts = object_total_counts or {}
         self.run_history = run_history or []
         self._init_counts()
 
@@ -50,6 +58,13 @@ class RulesEngine:
         }
         self.obj_counts = {
             performer: {obj: 0 for obj in self.objects}
+            for performer in self.performers
+        }
+        self.obj_role_counts = {
+            performer: {
+                obj: {"Domin": 0, "Alquist": 0}
+                for obj in self.objects
+            }
             for performer in self.performers
         }
         for run in self.run_history:
@@ -174,6 +189,8 @@ class RulesEngine:
         self.char_counts[performer][position] += 1
         if obj in self.obj_counts[performer]:
             self.obj_counts[performer][obj] += 1
+        if obj in self.obj_role_counts[performer]:
+            self.obj_role_counts[performer][obj][position] += 1
 
     def rule1_no_same_performer_both_positions(
         self, domin_perm: Tuple[str, str], alquist_perm: Tuple[str, str]
@@ -321,6 +338,32 @@ class RulesEngine:
 
         return True
 
+    def rule16_consecutive_performer_switch_character(
+        self,
+        domin_perm: Tuple[str, str],
+        alquist_perm: Tuple[str, str],
+    ) -> bool:
+        """
+        If a performer appears in consecutive runs, they must switch character
+        position (Domin <-> Alquist).
+        """
+        if not self.run_history:
+            return True
+
+        last_run = self.run_history[-1]
+
+        last_domin_perf = last_run["Domin"][1]
+        last_alquist_perf = last_run["Alquist"][1]
+        current_domin_perf = domin_perm[1]
+        current_alquist_perf = alquist_perm[1]
+
+        if last_domin_perf != "None" and current_domin_perf == last_domin_perf:
+            return False
+        if last_alquist_perf != "None" and current_alquist_perf == last_alquist_perf:
+            return False
+
+        return True
+
     def all_hard_rules(
         self,
         domin_perm: Tuple[str, str],
@@ -412,6 +455,13 @@ class RulesEngine:
             performer: self.obj_counts[performer].copy()
             for performer in self.performers
         }
+        temp_obj_role = {
+            performer: {
+                obj: self.obj_role_counts[performer][obj].copy()
+                for obj in self.objects
+            }
+            for performer in self.performers
+        }
 
         for position, perm in ("Domin", domin_perm), ("Alquist", alquist_perm):
             obj, performer = perm
@@ -420,6 +470,8 @@ class RulesEngine:
             temp_char[performer][position] += 1
             if obj in temp_obj[performer]:
                 temp_obj[performer][obj] += 1
+            if obj in temp_obj_role[performer]:
+                temp_obj_role[performer][obj][position] += 1
 
         penalty = 0
         for performer in self.performers:
@@ -433,7 +485,104 @@ class RulesEngine:
                 min_count = min(obj_counts.values())
                 penalty += (max_count - min_count)
 
+        for obj in self.objects:
+            eligible_performers = [
+                performer
+                for performer in self.object_performers.get(obj, [])
+                if performer in self.performers
+            ]
+            if len(eligible_performers) < 2:
+                continue
+
+            totals = [temp_obj[performer][obj] for performer in eligible_performers]
+            penalty += (max(totals) - min(totals)) * 60
+
+            for performer in eligible_performers:
+                dom_obj = temp_obj_role[performer][obj]["Domin"]
+                alq_obj = temp_obj_role[performer][obj]["Alquist"]
+                penalty += abs(dom_obj - alq_obj) * 25
+
+            total_obj_count = self.object_total_counts.get(obj)
+            if total_obj_count and eligible_performers:
+                min_target = total_obj_count // len(eligible_performers)
+                max_target = min_target + (1 if total_obj_count % len(eligible_performers) else 0)
+                midpoint = (min_target + max_target) / 2
+
+                for performer in eligible_performers:
+                    total_for_pair = temp_obj[performer][obj]
+                    penalty += int(abs(total_for_pair - midpoint) * 30)
+
+                    role_cap = (max_target + 1) // 2
+                    dom_obj = temp_obj_role[performer][obj]["Domin"]
+                    alq_obj = temp_obj_role[performer][obj]["Alquist"]
+                    if dom_obj > role_cap:
+                        penalty += (dom_obj - role_cap) * 120
+                    if alq_obj > role_cap:
+                        penalty += (alq_obj - role_cap) * 120
+
         return penalty
+
+    def _object_performer_target_bounds(self, obj: str) -> tuple[int, int] | None:
+        total_obj_count = self.object_total_counts.get(obj)
+        eligible_performers = [
+            performer
+            for performer in self.object_performers.get(obj, [])
+            if performer in self.performers
+        ]
+        if not total_obj_count or not eligible_performers:
+            return None
+        min_target = total_obj_count // len(eligible_performers)
+        max_target = min_target + (1 if total_obj_count % len(eligible_performers) else 0)
+        return min_target, max_target
+
+    def rule15_object_performer_target_cap(
+        self,
+        domin_perm: Tuple[str, str],
+        alquist_perm: Tuple[str, str],
+    ) -> bool:
+        """Prevent assigning any performer-object pair above its max target share."""
+        temp_obj = {
+            performer: self.obj_counts[performer].copy()
+            for performer in self.performers
+        }
+        temp_obj_role = {
+            performer: {
+                obj: self.obj_role_counts[performer][obj].copy()
+                for obj in self.objects
+            }
+            for performer in self.performers
+        }
+
+        for position, perm in ("Domin", domin_perm), ("Alquist", alquist_perm):
+            obj, performer = perm
+            if performer == "None" or performer not in temp_obj:
+                continue
+            if obj in temp_obj[performer]:
+                temp_obj[performer][obj] += 1
+            if obj in temp_obj_role[performer]:
+                temp_obj_role[performer][obj][position] += 1
+
+        for obj in self.objects:
+            bounds = self._object_performer_target_bounds(obj)
+            if not bounds:
+                continue
+            _, max_target = bounds
+            role_cap = (max_target + 1) // 2
+            for performer in self.object_performers.get(obj, []):
+                if performer in temp_obj and temp_obj[performer][obj] > max_target:
+                    return False
+                if (
+                    performer in temp_obj_role
+                    and temp_obj_role[performer][obj]["Domin"] > role_cap
+                ):
+                    return False
+                if (
+                    performer in temp_obj_role
+                    and temp_obj_role[performer][obj]["Alquist"] > role_cap
+                ):
+                    return False
+
+        return True
 
     def _intermission_pair_penalty(
         self,
@@ -460,6 +609,28 @@ class RulesEngine:
             return 25
 
         return 0
+
+    def _cross_position_performer_change_penalty(
+        self,
+        domin_perm: Tuple[str, str],
+        alquist_perm: Tuple[str, str],
+    ) -> int:
+        """Soft preference: when an object switches positions across runs, keep performer."""
+        if not self.run_history:
+            return 0
+
+        penalty = 0
+        last_run = self.run_history[-1]
+
+        last_alq_obj, last_alq_perf = last_run["Alquist"]
+        if domin_perm[0] == last_alq_obj and domin_perm[1] != last_alq_perf:
+            penalty += 12
+
+        last_dom_obj, last_dom_perf = last_run["Domin"]
+        if alquist_perm[0] == last_dom_obj and alquist_perm[1] != last_dom_perf:
+            penalty += 12
+
+        return penalty
 
     @staticmethod
     def _animatronic_partner_performer(
@@ -570,6 +741,10 @@ class RulesEngine:
             alquist_perm,
             animatronic_perm,
         )
+        cross_position_penalty = self._cross_position_performer_change_penalty(
+            domin_perm,
+            alquist_perm,
+        )
 
         end_run_penalty = 0
         if run_number is not None:
@@ -582,6 +757,7 @@ class RulesEngine:
             - balance_penalty
             - intermission_penalty
             - animatronic_rotation_penalty
+            - cross_position_penalty
             - end_run_penalty
         )
 

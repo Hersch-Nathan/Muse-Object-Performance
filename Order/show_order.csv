@@ -1,10 +1,19 @@
 Run,Time,Domin,DominPerformer,Alquist,AlquistPerformer,DominVoice,AlquistVoice
-1,7:25 PM,Robot,Moose,Muppet,Luca,Moose,Luca
-2,7:45 PM,Muppet,Luca,Shirt,Moose,Luca,Moose
-3,8:05 PM,Shirt,Moose,Robot,Luca,Moose,Luca
-4,8:25 PM,Animatronic,None,Shirt,Moose,Luca,Moose
-5,8:45 PM,Robot,Luca,Animatronic,None,Luca,Moose
-6,9:05 PM,Muppet,Moose,Robot,Luca,Moose,Luca
-7,9:25 PM,Robot,Luca,Shirt,Moose,Luca,Moose
-8,9:45 PM,Shirt,Moose,Muppet,Luca,Moose,Luca
-Show end,10:05 PM,,,,,,
+Day 1,,,,,,,
+1,7:40 PM,Shirt,Moose,Muppet,Luca,Moose,Luca
+2,8:00 PM ,Muppet,Luca,Robot,Moose,Luca,Moose
+3,8:20 PM,Robot,Moose,Shirt,Luca,Moose,Luca
+4,8:40 PM,Shirt,Luca,Robot,Moose,Luca,Moose
+Intermission, 9:00 PM,,,,,,
+5,9:20 PM,Muppet,Moose,Shirt,Luca,Moose,Luca
+6,9:40,Robot,Luca,Muppet,Moose,Luca,Moose
+Show End, 10:00 PM,,,,,,
+Day 2,,,,,,,,
+1,7:40 PM ,Shirt,Luca,Muppet,Moose,Luca,Moose
+2,8:00 PM ,Muppet,Moose,Robot,Luca,Moose,Luca
+3,8:20 PM,Robot,Luca,Shirt,Moose,Luca,Moose
+4,8:40 PM,Shirt,Moose,Robot,Luca,Moose,Luca
+Intermission, 9:00 PM,,,,,,
+5,9:20 PM,Muppet,Luca,Shirt,Moose,Luca,Moose
+6,9:40 PM,Robot,Moose,Muppet,Luca,Moose,Luca
+Show End, 10:00 PM,,,,,,

@@ -1,12 +1,12 @@
 show:
   name: "Assembled"
   runs_label: "Show Runs"
-  start_time: "7:25 PM"
-  run_count: 8
+  start_time: "7:40 PM"
+  run_count: 6
   step_minutes: 20
   intermission:
-    every_n_runs: 10
-    length_minutes: 10
+    every_n_runs: 4
+    length_minutes: 20
     none_before_after: true  # If true, force None performers before and after intermission for performer breaks
   random_seed: null  # Set to a number for reproducible random permutation order, null for no randomization
 
@@ -27,7 +27,5 @@ objects:
     performers: ["all"]  # "all" or list of performer names
   - name: "Muppet"
     performers: ["all"]
-  - name: "Animatronic"
-    performers: ["None"]
   - name: "Robot"
     performers: ["all"]

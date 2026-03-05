@@ -139,7 +139,11 @@ def build_object_pair_sequence(
             return 1 if pair[1] == animatronic_obj else 0
         return 0
 
-    def backtrack(run_index: int, last_pair: tuple[str, str] | None) -> bool:
+    def backtrack(
+        run_index: int,
+        last_pair: tuple[str, str] | None,
+        forbid_full_swap: bool,
+    ) -> bool:
         if run_index == run_count:
             return True
 
@@ -155,7 +159,10 @@ def build_object_pair_sequence(
                 or (
                     pair[0] != last_pair[0]
                     and pair[1] != last_pair[1]
-                    and not (pair[0] == last_pair[1] and pair[1] == last_pair[0])
+                    and (
+                        not forbid_full_swap
+                        or not (pair[0] == last_pair[1] and pair[1] == last_pair[0])
+                    )
                 )
             )
         ]
@@ -184,14 +191,21 @@ def build_object_pair_sequence(
                 continue
             counts[pair] += 1
             sequence.append(pair)
-            if backtrack(run_index + 1, pair):
+            if backtrack(run_index + 1, pair, forbid_full_swap):
                 return True
             sequence.pop()
             counts[pair] -= 1
 
         return False
 
-    if not backtrack(0, None):
+    if backtrack(0, None, True):
+        return sequence
+
+    sequence.clear()
+    for key in counts:
+        counts[key] = 0
+
+    if not backtrack(0, None, False):
         raise RuntimeError("No valid object pairing sequence found.")
 
     return sequence
@@ -256,7 +270,6 @@ def build_rows(
     }
 
     master_rows: list[dict] = []
-    rules = RulesEngine(all_performers, object_names, run_count)
     last_intermission_pair_performer = None
     object_pair_sequence = build_object_pair_sequence(
         object_names,
@@ -265,6 +278,18 @@ def build_rows(
         none_before_after,
         animatronic_obj,
         random_seed,
+    )
+    object_total_counts = {name: 0 for name in object_names}
+    for domin_obj, alquist_obj in object_pair_sequence:
+        object_total_counts[domin_obj] += 1
+        object_total_counts[alquist_obj] += 1
+
+    rules = RulesEngine(
+        all_performers,
+        object_names,
+        run_count,
+        object_performers=object_performers,
+        object_total_counts=object_total_counts,
     )
 
     for run_index, (domin_obj, alquist_obj) in enumerate(object_pair_sequence):
@@ -289,46 +314,59 @@ def build_rows(
             for performer in object_performers.get(alquist_obj, ["None"])
         ]
 
-        best_score = None
-        best_pair = None
+        def choose_best_pair(enforce_target_cap: bool) -> tuple[tuple[str, str], tuple[str, str]] | None:
+            best_score = None
+            best_pair = None
 
-        for domin_candidate in domin_candidates:
-            if not rules.rule3_no_same_object_consecutive_runs("Domin", domin_candidate[0]):
-                continue
-            if not rules.rule4_consecutive_object_same_performer("Domin", domin_candidate):
-                continue
-
-            for alquist_candidate in alquist_candidates:
-                if not rules.rule3_no_same_object_consecutive_runs("Alquist", alquist_candidate[0]):
-                    continue
-                if not rules.rule4_consecutive_object_same_performer("Alquist", alquist_candidate):
-                    continue
-                if not rules.rule1_no_same_performer_both_positions(
-                    domin_candidate, alquist_candidate
-                ):
-                    continue
-                if not rules.rule2_no_same_object_both_positions(
-                    domin_candidate, alquist_candidate
-                ):
-                    continue
-                if not rules.rule13_consecutive_animatronic_partner_diff(
-                    domin_candidate,
-                    alquist_candidate,
-                    animatronic_perm,
-                ):
+            for domin_candidate in domin_candidates:
+                if not rules.rule3_no_same_object_consecutive_runs("Domin", domin_candidate[0]):
                     continue
 
-                score = rules.score_permutation(
-                    domin_candidate,
-                    alquist_candidate,
-                    last_intermission_pair_performer,
-                    is_after_intermission,
-                    animatronic_perm,
-                    run_number,
-                )
-                if best_score is None or score > best_score:
-                    best_score = score
-                    best_pair = (domin_candidate, alquist_candidate)
+                for alquist_candidate in alquist_candidates:
+                    if not rules.rule3_no_same_object_consecutive_runs("Alquist", alquist_candidate[0]):
+                        continue
+                    if not rules.rule1_no_same_performer_both_positions(
+                        domin_candidate, alquist_candidate
+                    ):
+                        continue
+                    if not rules.rule2_no_same_object_both_positions(
+                        domin_candidate, alquist_candidate
+                    ):
+                        continue
+                    if not rules.rule16_consecutive_performer_switch_character(
+                        domin_candidate,
+                        alquist_candidate,
+                    ):
+                        continue
+                    if enforce_target_cap and not rules.rule15_object_performer_target_cap(
+                        domin_candidate,
+                        alquist_candidate,
+                    ):
+                        continue
+                    if not rules.rule13_consecutive_animatronic_partner_diff(
+                        domin_candidate,
+                        alquist_candidate,
+                        animatronic_perm,
+                    ):
+                        continue
+
+                    score = rules.score_permutation(
+                        domin_candidate,
+                        alquist_candidate,
+                        last_intermission_pair_performer,
+                        is_after_intermission,
+                        animatronic_perm,
+                        run_number,
+                    )
+                    if best_score is None or score > best_score:
+                        best_score = score
+                        best_pair = (domin_candidate, alquist_candidate)
+
+            return best_pair
+
+        best_pair = choose_best_pair(enforce_target_cap=True)
+        if best_pair is None:
+            best_pair = choose_best_pair(enforce_target_cap=False)
 
         if best_pair is None:
             raise RuntimeError(
